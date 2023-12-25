@@ -1,0 +1,9 @@
+connection_from:
+  database_from: 'postgres'
+  user_from: 'postgres'
+  password_from: 'postgres'
+  host_from: 'localhost'
+  port_from: '5433'
+  ssl_mode_from: ''
+  #sslrootcert_from: 'CA.pem'
+  shema_from: 'project_trudvsem'

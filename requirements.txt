@@ -1,0 +1,9 @@
+gensim==3.5.0
+lxml==4.8.0
+numpy==1.19.2
+pandas==0.25.3
+psycopg2_binary==2.9.3
+pyaspeller==0.2.0
+pymystem3==0.2.0
+PyYAML==6.0
+wget==3.2
