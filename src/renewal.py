@@ -10,7 +10,7 @@ import parsing_xmls
 from conf import Config
 from utils import get_date, unzip_cv, get_parser, make_df, to_str_wquotes, get_csv_files, rem_csv_files, read_csv_object, get_pickle_files, rem_pickle_files
 from adding_tables_psycopg import AddingDataPsycopg
-import process
+from process import process
 from geti import hashes, update_hashes
 from adding_tables_psycopg_rostrud import *
 
@@ -34,11 +34,11 @@ class Renewal:
         # здесь дата в формате 20180101 (имеет смысл исправить!)
         raw_date = get_date(self.pathfrom)
         self.date = raw_date[:4] + '-' + raw_date[4:6] + '-' + raw_date[6:]
-        self.workdir = Config(os.path.join('.', 'rostrud_ml/utils/all_tables_names.yml')).get_config('working_directory')
+        self.workdir = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('working_directory')
         
         self.datadir = os.path.join(self.workdir, table_name)
         if not os.path.isdir(self.datadir):
-            os.mkdir(self.datadir)
+            os.makedirs(self.datadir, exist_ok=True)
         self.pathxml = os.path.join(self.datadir, self.date + self.name + '.xml')
     
     def _wget(self, url, out, retry=5):
@@ -51,7 +51,7 @@ class Renewal:
                 
     def _check_cols(self, table_name):
         #fill undefined cols
-        self.col_names = Config(os.path.join('.', 'rostrud_ml/utils/all_tables_names.yml')).get_config('create_table')[table_name]
+        self.col_names = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('create_table')[table_name]
         self.col_types = [i.split()[1].lower() for i in self.col_names.split(',')] 
         self.col_names = [i.split()[0] for i in self.col_names.split(',')] 
                    
@@ -276,6 +276,8 @@ class Renewal:
                         self._write_to_bd(self.name)
                         print(f"{self.name}({csv_file}) добавлено {self.df.shape[0]} строк")
                         
+                    #finally:
+                    #    pass
                     except Exception as e:
                         print(f'{self.name}({csv_file}) error: {e}')                    
             #rem_csv_files(csv_files)

@@ -21,8 +21,8 @@ def process(table_name, df):
                 df[new_col_name] = cleaning.clean_out_html(df[col_name])
                 df[new_col_name] = df[new_col_name].apply(cleaning.del_punct_dig)
         try:
-            df['add_certificates_modified'] = df.add_certificates.apply(rostrud_ml.process.unify_cols.certificate)
-            df['other_info_modified'] = df.other_info.apply(rostrud_ml.process.unify_cols.other_info)
+            df['add_certificates_modified'] = df.add_certificates.apply(unify_cols.certificate)
+            df['other_info_modified'] = df.other_info.apply(unify_cols.other_info)
         except Exception as e:
             print(e)
             
@@ -67,7 +67,7 @@ def process(table_name, df):
                 df[new_col_name] = cleaning.clean_out_html(df[col_name])
                 df[new_col_name] = df[new_col_name].apply(cleaning.del_punct_dig)
         try:
-            df['achievements_modified'] = df.achievements.apply(rostrud_ml.process.unify_cols.achievements)
+            df['achievements_modified'] = df.achievements.apply(unify_cols.achievements)
         except Exception as e:
             print(e)
             

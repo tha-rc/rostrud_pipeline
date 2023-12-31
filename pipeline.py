@@ -33,7 +33,9 @@ monthly=True
 remove_gz=False
 
 base_url = 'https://opendata.trudvsem.ru/oda2Hialoephidohyie1oR6chaem1oN0quiephooleiWei1aiD/'
-file_url = ['7710538364-cv/', '7710538364-professions/', '7710538364-regions/', '7710538364-industries/', '7710538364-vacancy/', '7710538364-invitation/', '7710538364-response/']
+file_url = ['7710538364-cv/', '7710538364-professions/', '7710538364-regions/', 
+            '7710538364-industries/', '7710538364-vacancy/', 
+            '7710538364-invitation/', '7710538364-response/']
 
 def retreive_filelist(monthly=True):
     # last file in each month
@@ -120,6 +122,8 @@ for idx, link in tqdm(filelist.iterrows(), total=len(filelist)):
         ren.parse_update()
       except Exception as e:
         print(f'professions error: {e}')
+      #finally:
+      #    pass
       ren.delete(remove_gz=remove_gz)
       
       try:

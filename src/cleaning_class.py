@@ -27,7 +27,7 @@ class CleaningData:
 
     def better_col_names(self, df: pd.DataFrame, table_name: str) -> pd.DataFrame:
         """Поменять названия переменных на утверждённые"""
-        dict_names = Config(os.path.join('.', 'rostrud_ml/utils/all_tables_names.yml')).get_config('better_col_names')
+        dict_names = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('better_col_names')
         names = dict_names[table_name]
         df.rename(columns=names, inplace=True)
         return df  

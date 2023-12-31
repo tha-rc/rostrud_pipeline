@@ -21,8 +21,8 @@ def load_pickle(file_name):
 class Parse:
     def __init__(self, table_name):
         self.name = table_name
-        self.workdir = Config(os.path.join('.', 'rostrud_ml/utils/all_tables_names.yml')).get_config('working_directory')
-        self.variables_list = Config(os.path.join('.', 'rostrud_ml/utils/all_tables_names.yml')).get_config('md5_hash')   ##
+        self.workdir = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('working_directory')
+        self.variables_list = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('md5_hash')   ##
         self.datadir = os.path.join(self.workdir, self.name)
         if not os.path.isdir(self.datadir):
             print('Отсутствует директория: ', self.datadir)
