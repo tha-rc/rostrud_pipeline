@@ -163,8 +163,11 @@ class Renewal:
                         self._write_to_bd(table)
                         print(f"{table}({csv_file}) добавлено {self.df.shape[0]} строк")
                         
-                    except Exception as e:
-                        print(f'{table}({csv_file}) error: {e}')
+                    #except Exception as e:
+                    #    print(f'{table}({csv_file}) error: {e}')
+                        
+                    finally:
+                        pass
                 #rem_csv_files(csv_files)
                 rem_pickle_files(csv_files)
                 print("temporary files deleted")  

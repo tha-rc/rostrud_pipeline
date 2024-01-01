@@ -145,8 +145,6 @@ for idx, link in tqdm(filelist.iterrows(), total=len(filelist)):
         ren.parse_update()
       except Exception as e:
         print(f'professions error: {e}')
-      #finally:
-      #    pass
       ren.delete(remove_gz=remove_gz)
       
       try:
@@ -176,8 +174,12 @@ for idx, link in tqdm(filelist.iterrows(), total=len(filelist)):
       ren.download()
       ren.extract()
       ren.parse_update(default_tables=['curricula_vitae', 'workexp', 'edu', 'addedu'])  #default_tables=['curricula_vitae', 'workexp', 'edu', 'addedu']
-    except Exception as e:
-      print(f'curricula_vitae error: {e}')
+    #except Exception as e:
+    #  print(f'curricula_vitae error: {e}')
+      
+    finally:
+      pass
+      
     ren.delete(remove_gz=remove_gz)
 
   if pd.notna(link['invitation']):
