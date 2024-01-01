@@ -7,7 +7,7 @@ from conf import Config
 
 
 def hashes(table_name):
-    workdir = Config(os.path.join('.', 'rostrud_ml/utils/all_tables_names.yml')).get_config('working_directory')
+    workdir = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('working_directory')
     hash_path = os.path.join(workdir, table_name + '_hash_list.pickle')
     hash_set = set()
 
@@ -25,7 +25,7 @@ def update_hashes(table, old_hash_set, new_hash_list):
     print(datetime.datetime.now().time(), 'renew pickled hashes')
     # запишем обновлённый список хешей в наш кэш-файл
     all_hashes = set(new_hash_list).union(old_hash_set)
-    workdir = Config(os.path.join('.', 'rostrud_ml/utils/all_tables_names.yml')).get_config('working_directory')
+    workdir = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('working_directory')
     hash_path = os.path.join(workdir, table + '_hash_list.pickle')
     with open(hash_path, "wb") as fp:   #Pickling
         pickle.dump(all_hashes, fp)
