@@ -134,13 +134,24 @@ class Renewal:
             parser = get_parser(self.name, self.pathxml)
             for table in default_tables: #
                 #self.df = 
+                
+                
                 parser.to_csvs(table)
+                
+                
                 #csv_files = get_csv_files(self.datadir)
                 csv_files = get_pickle_files(self.datadir)
                 for csv_file in csv_files:
                     try:
                         #self.df = read_csv_object(csv_file)
                         self.df = load_pickle(csv_file)
+                        
+                        if 'hardSkills' in self.df.columns: #переименование с сентября 23
+                            if 'additionalSkills' in self.df.columns:
+                                self.df['additionalSkills'] = self.df['additionalSkills'] + ', ' + self.df['hardSkills'] + ', ' + self.df['softSkills']
+                            else:
+                                self.df['additionalSkills'] = self.df['hardSkills'] + ', ' + self.df['softSkills']
+                        
                         #self._check_cols(table)
                         self.df = process(table, self.df)
                         print(f"{table}({csv_file}) is processed")

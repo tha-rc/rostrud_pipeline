@@ -26,7 +26,11 @@ def process(table_name, df):
         except Exception as e:
             print(e)
             
-        
+        if 'birthday' in df.columns:
+            df['birthday'] = df['birthday'].astype(str).apply(lambda x: x[:4])
+            df['birthday'] = pd.to_numeric(df['birthday'], errors='coerce', downcast='integer').astype('Int64')
+            ###
+            
         onehot_cols = ['drive_licences', 
                        'schedule_type']
         for col in onehot_cols:
@@ -45,20 +49,26 @@ def process(table_name, df):
         for col in cols:
             if col in df.columns:
                 cleaning.create_zero_one_col(col, df)
+                
         if 'position_name_orig' in df.columns:
             df['position_name'] = df.position_name_orig.apply(cleaning.del_punct_dig)
             df.position_name = df.position_name.apply(cleaning.capital_lower_strip)
+            
         if 'salary' in df.columns:
             df = cleaning.abs_col('salary', df)
+            
         if 'date_publish' in df.columns:
             df = cleaning.time_date_separation('date_publish', df)
+            
         df['inactive'] = 0
-        df['profession_code'] = df['profession_code'].apply(cleaning.del_not_dig)
+        if 'profession_code' in df.columns:
+            df['profession_code'] = df['profession_code'].apply(cleaning.del_not_dig)
     
     # обработка опыта работы
     if table_name == 'workexp':
         # удаляем дубликаты строк
         df.drop_duplicates(subset=None, keep='first', inplace=True, ignore_index=True)
+        
         cols = ['achievements_orig', 
                 'demands_orig']
         for col_name in cols:

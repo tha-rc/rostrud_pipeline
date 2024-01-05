@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS project_trudvsem.agg_edu AS
 									 FROM project_trudvsem.addedu
 									 WHERE grad_year_mistake = 0 AND id_cv IS NOT NULL AND LENGTH(COALESCE(course_name, description, graduate_year, legal_name, '')) > 3)) AS ae
                         ON cv.id_cv = ae.id_cv
-        GROUP BY cv.id_cv, cv.date_modify_inner_info, date_publish, date_last_updated
-        ORDER BY cv.id_cv, cv.date_modify_inner_info, date_publish, date_last_updated DESC;
+        GROUP BY cv.id_cv, date_last_updated, cv.date_modify_inner_info, date_publish
+        ORDER BY cv.id_cv, date_last_updated, cv.date_modify_inner_info, date_publish DESC;
 
 CREATE TABLE IF NOT EXISTS project_trudvsem.agg_exp AS
 	SELECT DISTINCT ON (cv.id_cv) cv.id_cv, 
@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS project_trudvsem.agg_exp AS
 									FROM project_trudvsem.workexp
 									WHERE date_mistake = 0 AND id_cv IS NOT NULL AND LENGTH(COALESCE(company_name, date_from, date_to, job_title, '')) > 3)) AS exp
                        ON cv.id_cv = exp.id_cv
-        GROUP BY cv.id_cv, cv.date_modify_inner_info, date_publish, date_last_updated
-        ORDER BY cv.id_cv, cv.date_modify_inner_info, date_publish, date_last_updated DESC;
+        GROUP BY cv.id_cv, date_last_updated, cv.date_modify_inner_info, date_publish
+        ORDER BY cv.id_cv, date_last_updated, cv.date_modify_inner_info, date_publish DESC;
 
 CREATE TABLE IF NOT EXISTS project_trudvsem.dataset2 AS
 	SELECT DISTINCT ON (id_candidate, cv.id_cv)
@@ -74,6 +74,6 @@ CREATE TABLE IF NOT EXISTS project_trudvsem.dataset2 AS
           substring(region_code::text from 1 for 2) != '93' AND --КЛАДР Донецкая
           substring(region_code::text from 1 for 2) != '94' AND --КЛАДР Луганская
           -- date_publish >= '2019.01.01'
-    ORDER BY id_candidate, cv.id_cv, date_modify_inner_info, date_creation, date_publish, date_last_updated DESC;
+    ORDER BY id_candidate, cv.id_cv, date_last_updated, date_modify_inner_info, date_creation, date_publish DESC;
 
 

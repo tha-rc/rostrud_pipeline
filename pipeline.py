@@ -51,7 +51,7 @@ import pandas as pd
 from src.adding_tables_psycopg import AddingDataPsycopg
 from src.renewal import Renewal
 
-file_name = './filelist_monthly.csv'
+file_name = './filelist.csv'
 monthly=True
 remove_gz=False
 

@@ -19,7 +19,7 @@ def load_pickle(file_name):
         return pickle.load(f)
 
 class Parse:
-    def __init__(self, table_name):
+    def __init__(self, table_name, chunk_size=100000):
         self.name = table_name
         self.workdir = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('working_directory')
         self.variables_list = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('md5_hash')   ##
@@ -29,7 +29,7 @@ class Parse:
         self.filenamexml = [f for f in os.listdir(self.datadir) if f.endswith('.xml')][0]
         self.date = self.filenamexml[:10]
         self.pathxml = os.path.join(self.datadir, self.filenamexml)
-        self.csv_size = 1500000
+        self.csv_size = chunk_size
         
 # Парсинг файла с резюме    
 class ParseCvs(Parse):
@@ -44,6 +44,7 @@ class ParseCvs(Parse):
             l = [] #пустой список
             i = 1
             # получаем список хешей всех ранее загруженных записей:
+            #old_hash_set = set()#hashes(table)
             old_hash_set = hashes(table)
             # пустой список для новых хешей при необходимости версионирования
             #new_hash_list = []
@@ -104,8 +105,20 @@ class ParseCvs(Parse):
                     #break
             #update_hashes(table, old_hash_set, new_hash_list) 
 
+                    #print(pd.DataFrame(l).columns)
+                    #print(pd.DataFrame(l)['stateRegionCode'])
+                    #kk = pd.DataFrame(l)
+                    #print(pd.to_numeric(kk.birthday, errors='coerce').fillna(1990))
+                    #print(kk.birthday.astype(str).apply(lambda x: x[:4]).astype(int))
+                    #print(kk)
+                    #if 'birthday' in kk.columns:
+                    #    print(kk['birthday'])
+                    #print(kk['hardSkills'] + ', ' + kk['softSkills'])
+                    
+                    
                     if len(l) == self.csv_size: 
                         df = pd.DataFrame(l)
+                        #print(df.columns)
 
                         #df.to_csv(self.datadir + f'/{table}{i}.csv', index=False)
                         save_pickle(df, self.datadir + f'/{table}{i}.pickle')
@@ -131,6 +144,9 @@ class ParseCvs(Parse):
             i = 1
             # получаем список хешей всех ранее загруженных записей:
             old_hash_set = hashes(table)
+            #old_hash_set = set()
+            
+            
             # пустой список для новых хешей
             #new_hash_list = []
             for event, elem in tqdm(etree.iterparse(self.pathxml, tag=tags[table], recover=True)):
@@ -161,6 +177,8 @@ class ParseCvs(Parse):
                     #j += 1
                     #if j >= 100:
                     #    break
+                    
+                    #print(pd.DataFrame(l).columns)
 
                     if len(l) == self.csv_size: 
                         df = pd.DataFrame(l)

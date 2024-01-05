@@ -16,11 +16,11 @@ create_table:
   #for_matching_vac: "id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, identifier TEXT, text_w2v TEXT, salary INT, experience_salary INT, accommodation_salary_vac INT, retraining_capability INT"
   
 better_col_names:
-  curricula_vitae: {'add_certificates': 'add_certificates_orig', 
+  curricula_vitae: {'add_certificates': 'add_certificates_orig', 'other_certificates': 'add_certificates_orig',
   'additional_skills': 'additional_skills_orig', 
   'candidate_id': 'id_candidate', 
   'country_country_name': 'country', 
-  'creation_date': 'date_creation', 
+  'creation_date': 'date_creation', 'date_create': 'date_creation',
   'competitions_abilympics_inspection_status': 'abilympics_status', 
   'competitions_abilympics_participation': 'abilympics_participation', 
   'drive_licence_list_drive_licences': 'drive_licences', 
@@ -29,17 +29,17 @@ better_col_names:
   'inner_info_id_user': 'id_user_inner_info', 
   'other_info': 'other_info_orig', 
   'position_name': 'position_name_orig', 
-  'publish_date': 'date_publish', 
-  'regions': 'region_code', 
+  'publish_date': 'date_publish', 'published_date': 'date_publish',
+  'regions': 'region_code', #'state_region_code': 'region_code',
   'qualification_nark_certificate': 'nark_certificate', 
   'qualification_nark_inspection_status': 'nark_inspection_status', 
   'schedule_types_list_schedule_type': 'schedule_type', 
-  'skills': 'skills_orig', 
-  'worldskills_competence_international_name': 'worldskills_international_name', 
+  'skills': 'skills_orig', 'professional_skills' : 'skills_orig',
+  'worldskills_competence_international_name': 'worldskills_international_name', 'worldskills_worldskill_international_name': 'worldskills_international_name',
   'worldskills_competence_is_international': 'worldskills_is_international', 
-  'worldskills_competence_russian_name': 'worldskills_russian_name', 
-  'worldskills_competence_skill_abbreviation': 'worldskills_skill_abbreviation', 
-  'worldskills_competence_type': 'worldskills_type'}
+  'worldskills_competence_russian_name': 'worldskills_russian_name', 'worldskills_worldskill_russian_name': 'worldskills_russian_name',
+  'worldskills_competence_skill_abbreviation': 'worldskills_skill_abbreviation', 'worldskills_worldskill_skill_abbreviation': 'worldskills_skill_abbreviation',
+  'worldskills_competence_type': 'worldskills_type', 'worldskills_worldskill_type': 'worldskills_type',}
 
   workexp: {'achievements': 'achievements_orig', 
             'demands': 'demands_orig', 

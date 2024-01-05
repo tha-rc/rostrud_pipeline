@@ -29,7 +29,9 @@ class CleaningData:
         """Поменять названия переменных на утверждённые"""
         dict_names = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('better_col_names')
         names = dict_names[table_name]
-        df.rename(columns=names, inplace=True)
+        for k, v in names.items(): ###
+            if v not in df.columns:
+                df.rename(columns={k : v}, inplace=True)
         return df  
     
     def str_clean_first(self, string: str) -> str:
@@ -234,7 +236,7 @@ class CleaningData:
             experience_mistake[df.experience.isin(wrong_years)] = 1
             return df.insert(df.shape[1], 'experience_mistake', experience_mistake)
         elif series_name == 'birthday':
-            birth_years = df.birthday.fillna(1990).astype('int').unique().tolist()
+            birth_years = df.birthday.fillna(1990).astype('int').unique().tolist() ###
             birthday_mistake = pd.Series(0, index = df.birthday.index)
             wrong_years = [str(x) for x in birth_years if ((x < (now.year - 85)) or (x > (now.year - 14)))]
             birthday_mistake[df.birthday.isin(wrong_years)] = 1
@@ -355,7 +357,8 @@ class CleaningData:
             df.loc[(df.first_rate_company == 'Не относится к крупнейшим компаниям') | (df.first_rate_company == 'false'), 'first_rate_company'] = 0
             return df
         elif series_name == 'abilympics_participation':
-            df.loc[df.abilympics_participation == 'Участник движения', 'abilympics_participation'] = 1
+            df.loc[(df.abilympics_participation == 'Участник движения') | (df.abilympics_participation == 'Принимал участие в движении Абилимпикс'), 'abilympics_participation'] = 1
+            df.loc[(df.abilympics_participation == 'Не принимал участие в движении Абилимпикс'), 'abilympics_participation'] = 0
             return df
         elif series_name == 'business_trips':
             df.loc[(df.business_trips == 'Готов к командировкам') | (df.business_trips == 'true'), 'business_trips'] = 1
@@ -368,8 +371,8 @@ class CleaningData:
             df.loc[df.nark_inspection_status == 'Данные подтверждены', 'nark_inspection_status'] = 1
             return df
         elif series_name == 'relocation':
-            df.loc[(df.relocation == 'Да') | (df.relocation == 'true'), 'relocation'] = 1
-            df.loc[(df.relocation == 'Нет') | (df.relocation == 'false'), 'relocation'] = 0
+            df.loc[(df.relocation == 'Да') | (df.relocation == 'true') | (df.relocation == "Готов к переезду"), 'relocation'] = 1
+            df.loc[(df.relocation == 'Нет') | (df.relocation == 'false') | (df.relocation == "Не готов к переезду"), 'relocation'] = 0
             return df
         elif series_name == 'worldskills_type':
             df.loc[df.worldskills_type == 'Participation', 'worldskills_type'] = 1
