@@ -1,7 +1,8 @@
 import gzip, os
-import glob
+#import glob
 import shutil
 import pickle
+import requests
 from os import listdir
 import pandas as pd
 from parsing_xmls import *
@@ -22,7 +23,7 @@ def unzip_cv(path):
             shutil.copyfileobj(f_in, f_out)
 
 # Выбрать парсер по переданному имени обновляемой таблицы
-def get_parser(table_name, path=None):
+def get_parser(table_name):#, path=None):
     if table_name == 'curricula_vitae':
         return ParseCvs()
     if table_name == 'invitations':
@@ -91,3 +92,45 @@ def rem_pickle_files(filepaths):
         for f in filepaths:
             os.remove(f)
 
+def retreive_filelist(base_url, file_url, monthly=True, start_from=2019):
+    # print(file_url)
+    # last file in each month
+    def _getfileslist(url):
+      r = requests.get(url)
+      return ['data' + i.split('">data')[0] for i in r.text.split('<a href="data')[1:]]
+    
+    s = pd.DataFrame(_getfileslist(base_url + file_url[0])).rename(columns={0: 'cv'})
+    s = s[s['cv'].apply(lambda x: pd.notna(x) and '.gz' in x)]
+    s = s[s['cv'].apply(lambda x: int(x.split('data-')[1][:4]) >= start_from)]
+
+    if monthly:
+      s['month'] = s['cv'].apply(lambda x: x.split('data-')[1][:6])
+      s = s.groupby('month').agg('last').reset_index()
+      for l in file_url[1:]:
+          c = l.split('-')[1]
+          c = c[:len(c)-1]
+          v = pd.DataFrame(pd.Series(_getfileslist(base_url + l)).rename(c))
+          v = v[v[c].apply(lambda x: pd.notna(x) and '.gz' in x)]
+          v = v[v[c].apply(lambda x: int(x.split('data-')[1][:4]) >= start_from)]
+          v['month'] = v[c].apply(lambda x: x.split('data-')[1][:6])
+          v = v.groupby('month').agg('last').reset_index()
+          s = s.set_index('month').join(v.set_index('month')).reset_index()
+    else:
+    # all files
+      s['date'] = s['cv'].apply(lambda x: x.split('data-')[1][:8])
+      s = s.groupby('date').agg('last').reset_index()
+      for l in file_url[1:]:
+          c = l.split('-')[1]
+          c = c[:len(c)-1]
+          v = pd.DataFrame(pd.Series(_getfileslist(base_url + l)).rename(c))
+          v = v[v[c].apply(lambda x: pd.notna(x) and '.gz' in x)]
+          v = v[v[c].apply(lambda x: int(x.split('data-')[1][:4]) >= start_from)]
+          v['date'] = v[c].apply(lambda x: x.split('data-')[1][:8])
+          v = v.groupby('date').agg('last').reset_index()
+          s = s.set_index('date').join(v.set_index('date')).reset_index()
+    #s.to_csv('filtered_all.csv', index=False)
+    s['added'] = False
+    return s.rename(columns={'cv' : 'curricula_vitae',
+                             'vacancy' : 'vacancies',
+                             'invitation' : 'invitations',
+                             'response' : 'responses'})

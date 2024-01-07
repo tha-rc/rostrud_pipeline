@@ -2,7 +2,7 @@
 import re
 import os
 import pandas as pd
-from os import listdir
+#from os import listdir
 import datetime
 from conf import Config
 
@@ -229,19 +229,19 @@ class CleaningData:
         """Функция для оценки и создания колонки
         с флагом ошибочных значений"""
         now = datetime.datetime.now()
-        if series_name == 'experience':
+        if series_name == 'experience' and 'experience' in df.columns:
             exp_years = df.experience.fillna(1).astype('int').unique().tolist()
             experience_mistake = pd.Series(0, index = df.experience.index)
             wrong_years = [str(x) for x in exp_years if ((x < 0) or (x > 65))]
             experience_mistake[df.experience.isin(wrong_years)] = 1
             return df.insert(df.shape[1], 'experience_mistake', experience_mistake)
-        elif series_name == 'birthday':
+        elif series_name == 'birthday' and 'birthday' in df.columns:
             birth_years = df.birthday.fillna(1990).astype('int').unique().tolist() ###
             birthday_mistake = pd.Series(0, index = df.birthday.index)
             wrong_years = [str(x) for x in birth_years if ((x < (now.year - 85)) or (x > (now.year - 14)))]
             birthday_mistake[df.birthday.isin(wrong_years)] = 1
             return df.insert(df.shape[1], 'birthday_mistake', birthday_mistake)
-        elif series_name == 'graduate_year':
+        elif series_name == 'graduate_year' and 'graduate_year' in df.columns:
             grad_years = df.loc[df.graduate_year.notna(), 'graduate_year'].astype('int').unique().tolist()
             df['grad_year_mistake'] = 0
             wrong_years = [str(x) for x in grad_years if ((x < (now.year - 70)) or (x > (now.year + 4)))]

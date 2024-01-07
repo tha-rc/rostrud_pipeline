@@ -1,17 +1,18 @@
 import wget
 import os
-import sys
+#import sys
 #sys.path.append('./process')
-import shutil
-import pandas as pd
-import hashlib
+import shutil, time
+#import pandas as pd
+#import hashlib
 import pickle
-import parsing_xmls
+#import parsing_xmls
 from conf import Config
-from utils import get_date, unzip_cv, get_parser, make_df, to_str_wquotes, get_csv_files, rem_csv_files, read_csv_object, get_pickle_files, rem_pickle_files
+from utils import get_date, unzip_cv, get_parser, get_pickle_files, rem_pickle_files#make_df, to_str_wquotes, get_csv_files, rem_csv_files, read_csv_object, 
 from adding_tables_psycopg import AddingDataPsycopg
 from process import process
-from geti import hashes, update_hashes
+#from geti import hashes, update_hashes
+from humanfriendly import format_timespan
 from adding_tables_psycopg_rostrud import *
 
 def save_pickle(df, file_name):
@@ -102,7 +103,7 @@ class Renewal:
             unzip_cv(pathgz)
         print('xml/gz files are extracted:', self.date)
             
-    def parse_update(self, default_tables=['curricula_vitae', 'workexp', 'edu', 'addedu']):
+    def parse_update(self, default_tables=['curricula_vitae', 'edu', 'addedu', 'workexp']):
         print(self.date)
         '''
         to_delete = ['stat_citizens', 'industries', 'professions', 'regions', 'stat_companies']
@@ -131,7 +132,7 @@ class Renewal:
         '''
         if self.name == 'curricula_vitae':   
         #elif self.name == 'curricula_vitae':
-            parser = get_parser(self.name, self.pathxml)
+            parser = get_parser(self.name)#, self.pathxml)
             for table in default_tables: #
                 #self.df = 
                 
@@ -142,6 +143,7 @@ class Renewal:
                 #csv_files = get_csv_files(self.datadir)
                 csv_files = get_pickle_files(self.datadir)
                 for csv_file in csv_files:
+                    _start_time = time.time()
                     try:
                         #self.df = read_csv_object(csv_file)
                         self.df = load_pickle(csv_file)
@@ -174,11 +176,12 @@ class Renewal:
                         self._write_to_bd(table)
                         print(f"{table}({csv_file}) добавлено {self.df.shape[0]} строк")
                         
-                    #except Exception as e:
-                    #    print(f'{table}({csv_file}) error: {e}')
+                    except Exception as e:
+                        print(f'{table}({csv_file}) error: {e}')
                         
-                    finally:
-                        pass
+                    #finally:
+                    #    pass
+                    print(f"consumed time: {format_timespan(time.time() - _start_time)}")
                 #rem_csv_files(csv_files)
                 rem_pickle_files(csv_files)
                 print("temporary files deleted")  
@@ -261,6 +264,7 @@ class Renewal:
             #csv_files = get_csv_files(self.datadir)
             csv_files = get_pickle_files(self.datadir)
             for csv_file in csv_files:
+                    _start_time = time.time()
                     try:
                         #self.df = read_csv_object(csv_file)
                         self.df = load_pickle(csv_file)
@@ -270,7 +274,9 @@ class Renewal:
                         print(f"{self.name}({csv_file}) is processed")
                         
                         #fill undefined cols
+                        #print(self.df.columns)
                         self._check_cols(self.name)
+                        #print(self.df.columns)
                         #self.col_names = Config(os.path.join('.', 'rostrud_ml/utils/all_tables_names.yml')).get_config('create_table')[self.name] ##
                         #self.col_names = [i.split()[0] for i in self.col_names.split(',')]            
                         #for c in self.col_names:
@@ -293,7 +299,8 @@ class Renewal:
                     #finally:
                     #    pass
                     except Exception as e:
-                        print(f'{self.name}({csv_file}) error: {e}')                    
+                        print(f'{self.name}({csv_file}) error: {e}')     
+                    print(f"consumed time: {format_timespan(time.time() - _start_time)}")               
             #rem_csv_files(csv_files)
             rem_pickle_files(csv_files)
             print("temporary files deleted")

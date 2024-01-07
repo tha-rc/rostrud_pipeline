@@ -28,7 +28,7 @@ class AddingDataPsycopg:
         """)        #sslmode={attributes['ssl_mode_from']}
         with self.conn.cursor() as cursor:
             cursor.execute('SELECT current_database ();')
-            print(f'database connection established: {cursor.fetchone()[0]}')
+            print(f'request to database: {cursor.fetchone()[0]}')
         
     def write_to_sql(self, df: pd.DataFrame, table_name: str, schema: str):
         """Функция, которая которая загружает записи в БД"""

@@ -1,11 +1,11 @@
-import os
+import os, sys
 import pandas as pd
 import pickle
 import hashlib
 from tqdm import tqdm
 from lxml import etree
 from adding_tables_psycopg import AddingDataPsycopg
-from geti import hashes, update_hashes, create_md5
+from geti import hashes, create_md5 #update_hashes
 from conf import Config
 #from rostrud_ml.process.utils import save_pickle
 
@@ -19,7 +19,7 @@ def load_pickle(file_name):
         return pickle.load(f)
 
 class Parse:
-    def __init__(self, table_name, chunk_size=100000):
+    def __init__(self, table_name, chunk_size=250000):
         self.name = table_name
         self.workdir = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('working_directory')
         self.variables_list = Config(os.path.join('./src/', 'all_tables_names.yml')).get_config('md5_hash')   ##
@@ -129,15 +129,22 @@ class ParseCvs(Parse):
                         
             df = pd.DataFrame(l)
             #df.to_csv(self.datadir + f'/{table}.csv', index=False)
+            
             save_pickle(df, self.datadir + f'/{table}.pickle')
             print(f'{table} is prepared')
             #return df
 
 # Опыт работы, Образование, Дополнительное образование:
         else:
-            tags = {'workexp': "workExperience",
-                    'edu': "educationType",
-                    'addedu': "addEducation"}
+            #print(table)
+            #sys.exit()
+            tags_list = {'workexp': "workExperienceList",
+                    'edu': "educationList", #education
+                    'addedu': "additionalEducationList"} #additionalEducation
+            #tags = {'workexp': ["workExperience"],
+            #        'edu': ["educationType", "education"],
+            #        'addedu': ["addEducation", "additionalEducation"],
+            #}
             df = pd.DataFrame()
             l = []
             #j = 1
@@ -146,14 +153,60 @@ class ParseCvs(Parse):
             old_hash_set = hashes(table)
             #old_hash_set = set()
             
-            
+            #from itertools import islice
+            #with open(self.pathxml, encoding='utf-8') as input_file:
+            #    head = list(islice(input_file, 10))
+            #print(head)
+            #sys.exit()
             # пустой список для новых хешей
             #new_hash_list = []
-            for event, elem in tqdm(etree.iterparse(self.pathxml, tag=tags[table], recover=True)):
+            for event, elem in tqdm(etree.iterparse(self.pathxml, tag='cv', recover=True)): #tags[table]
                 # для каждой записи с нужным тегом создаётся хеш-сумма и сравнивается с имеющимися
+                id_cv = elem.attrib['about'].rsplit('#', maxsplit=1)[-1] # id находится в ссылке атрибута about
+                #print(id_cv)
+                for element in list(elem):  # Проходимся по каждому элементу в наборе
+                    if element.tag == tags_list[table]:
+                        #print(tags_list[table], len(list(element)))
+                        if len(list(element)) >= 1:
+                            for sub_element in list(element):
+                                #print(sub_element.tag)
+                                md5_hash = hashlib.md5(etree.tostring(sub_element, encoding='UTF-8')).hexdigest()
+                                if md5_hash not in old_hash_set:
+                                    old_hash_set.add(md5_hash)
+                                    d = {}
+                                    d['md5_hash'] = md5_hash
+                                    d['id_cv'] = id_cv
+                                    d['date_last_updated'] = self.date
+                                    for sub_sub_element in list(sub_element):
+                                        d[sub_sub_element.tag] = sub_sub_element.text
+                                    l.append(d)
+                                    #print(d)
+                                    #sys.exit()
+                                    if len(l) == self.csv_size: 
+                                        df = pd.DataFrame(l)
+                                        #print(l)
+                                        #break
+                                        #df.to_csv(self.datadir + f'/{table}{i}.csv', index=False)
+                                        save_pickle(df, self.datadir + f'/{table}{i}.pickle')
+                                        i = i + 1
+                                        l = []
+                                        df = pd.DataFrame()
                 
+                elem.clear()
+                for ancestor in elem.xpath('ancestor-or-self::*'):
+                    while ancestor.getprevious() is not None:
+                        del ancestor.getparent()[0]       
+                                        
+
+                    #for ancestor in elem.xpath('ancestor-or-self::*'):
+                    #    while ancestor.getprevious() is not None:
+                    #        del ancestor.getparent()[0]
+
                 #for element in list(elem): 
-                #        print(element.tag, element.text)
+                #    print(element.tag, element.text)
+                #print(elem.iter)
+            #sys.exit()
+            '''
                 md5_hash = hashlib.md5(etree.tostring(elem, encoding='UTF-8')).hexdigest()
                 if md5_hash not in old_hash_set:
                     old_hash_set.add(md5_hash)
@@ -178,7 +231,8 @@ class ParseCvs(Parse):
                     #if j >= 100:
                     #    break
                     
-                    #print(pd.DataFrame(l).columns)
+                    print(pd.DataFrame(l).columns)
+                    break
 
                     if len(l) == self.csv_size: 
                         df = pd.DataFrame(l)
@@ -189,6 +243,7 @@ class ParseCvs(Parse):
                         i = i + 1
                         l = []
                         df = pd.DataFrame()
+            '''
                         
             df = pd.DataFrame(l)
             #df.to_csv(self.datadir + f'/{table}.csv', index=False)

@@ -1,4 +1,4 @@
-import re
+#import re
 
 # Функция для унификации описаний доп.сертификатов
 def certificate(string):
