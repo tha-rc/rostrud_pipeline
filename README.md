@@ -19,6 +19,6 @@ There are two data preparation SQL scripts located in the `datasets` folder that
 
 ## License
 
-We adapted a pipeline that was originally developed by researcher from [CPUR](https://cpur.pro/en)/[INID](https://web.archive.org/web/20220124060237/https://www.data-in.ru/).
+We adapted a pipeline that was originally developed by researchers from [CPUR](https://cpur.pro/en)/[INID](https://web.archive.org/web/20220124060237/https://www.data-in.ru/).
 
-All raw data available in the source are distributed in the public domain and are completely free of charge based on the principles of use by the Russian Government ([see](https://github.com/Ellariel/rostrud_pipeline/blob/main/misc/protokol2016.pdf)). The data that was obtained as a result of our scripts are distributed under CC-BY-4.0 ([see](https://github.com/Ellariel/rostrud_pipeline/blob/main/misc/CC-BY-4.0.txt)). All code is provided under the MIT license ([see](https://github.com/Ellariel/rostrud_pipeline/blob/main/MIT.txt)) and can be used freely.
+All raw data available in the source are distributed in the public domain and are completely free of charge based on the principles of use by the Russian Government ([see](https://github.com/Ellariel/rostrud_pipeline/blob/main/misc/protokol2016.pdf)). The data that was obtained as a result of our scripts are distributed under CC-BY-4.0 ([see](https://github.com/Ellariel/rostrud_pipeline/blob/main/misc/CC-BY-4.0.txt)). All code is provided under the MIT license ([see](https://github.com/Ellariel/rostrud_pipeline/blob/main/MIT.txt)) and can also be used freely.

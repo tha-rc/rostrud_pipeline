@@ -32,9 +32,9 @@ from src.adding_tables_psycopg import AddingDataPsycopg
 from src.renewal import Renewal
 from src.utils import retreive_filelist
 
-monthly=True
-remove_gz=False
-filelist_name = './filelist.csv'
+monthly=True # Обрабатывать только архивы на последний день месяца
+remove_gz=False # Удалять ли gz архив после обработки, по умолчанию сохраняется
+filelist_name = './filelist.csv' # Файл фиксирующий список ссылок и обработанных архивов (см. атрибут added)
 base_url = 'https://opendata.trudvsem.ru/oda2Hialoephidohyie1oR6chaem1oN0quiephooleiWei1aiD/'
 tables = {'curricula_vitae': '7710538364-cv/',
           'workexp': '7710538364-cv/',
@@ -62,13 +62,14 @@ db = AddingDataPsycopg()
 for table in tables.keys():
   db.create_table(str(table), 'project_trudvsem') # 'project_trudvsem' - название схемы в БД, необходимо создать заранее
 db.conn.close()
+del db
 
 print(f"starting process...")
 for idx, link in tqdm(filelist.iterrows(), total=len(filelist)):
   if link['added']:
       continue
      
-  if idx == filelist.index[0]: # выполняется только для свежего архива в списке
+  if idx == filelist.index[0]: # выполняется только для наиболее позднего архива в списке (первая строка)
       for table in ['professions', 'industries', 'regions']:
         if pd.notna(link[table]):
           print(f'\n{table}')
@@ -80,6 +81,7 @@ for idx, link in tqdm(filelist.iterrows(), total=len(filelist)):
           except Exception as e:
             print(f'{table} error: {e}')
           r.delete(remove_gz=remove_gz)
+          del r
         else:
           print(f'no link for {table}')
 
@@ -94,6 +96,7 @@ for idx, link in tqdm(filelist.iterrows(), total=len(filelist)):
           except Exception as e:
             print(f'{table} error: {e}')
           r.delete(remove_gz=remove_gz)
+          del r
       else:
           print(f'no link for {table}')  
   
