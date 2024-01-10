@@ -13,8 +13,8 @@ The name of the temporary folder, e.g. workdir, must be specified in the `workin
 ## Datasets preparation
 
 There are two data preparation SQL scripts located in the `datasets` folder that create cleaned aggregates for:
-1) A dataset on the activities of unemployed candidates
-2) A dataset on education and career trajectories
+1) A dataset on education and career trajectories
+2) A dataset on the activities of unemployed candidates
 
 
 ## License

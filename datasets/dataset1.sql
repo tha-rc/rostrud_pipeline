@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS project_trudvsem.agg_exp AS
                   LEFT JOIN (SELECT id_cv, CONCAT('{', '"company_name":"', COALESCE(REPLACE(company_name::text, '"', ''), ''), '"', ',',  '"date_from":"', COALESCE(REPLACE(date_from::text, '"', ''), ''), '"', ',',  '"date_to":"', COALESCE(REPLACE(date_to::text, '"', ''), ''), '"', ',', '"job_title":"', COALESCE(REPLACE(job_title::text, '"', ''), ''), '"', '}') AS workexp
                              FROM (SELECT DISTINCT id_cv, company_name, date_from, date_to, job_title
 									FROM project_trudvsem.workexp
-									WHERE date_mistake = 0 AND id_cv IS NOT NULL AND LENGTH(COALESCE(company_name, date_from, date_to, job_title, '')) > 3) AS exp) AS exp
+									WHERE date_mistake = 0 AND id_cv IS NOT NULL AND LENGTH(COALESCE(company_name, date_from::text, date_to::text, job_title, '')) > 3) AS exp) AS exp
                        ON cv.id_cv = exp.id_cv
         GROUP BY cv.id_cv, date_last_updated, cv.date_modify_inner_info, date_publish
         ORDER BY cv.id_cv, date_last_updated, cv.date_modify_inner_info, date_publish DESC;
