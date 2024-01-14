@@ -1,0 +1,105 @@
+import os
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
+import warnings
+warnings.filterwarnings("ignore")
+
+def _deduplicate(x):
+    if isinstance(x, list):
+      l = len(x)
+      if l == 0:
+        return np.nan
+      if isinstance(x[0], dict):
+        return pd.DataFrame(x).drop_duplicates().to_dict('records')
+      x = list(dict.fromkeys(x))
+      if len(x) == 1:
+        return x[0]
+    return x
+
+def process_chunk(chunk):
+    filtered = []
+    for idx, subset in chunk.groupby(['id_candidate']):
+            if len(subset) > 1: # если есть несколько CV, то собираем в одну запись всю информацию
+                  subset = subset.to_dict('records')
+                  item = {k : [] for k in subset[0].keys()}
+                  for i in subset:
+                    for k in item.keys():
+                      if isinstance(i[k], list):
+                        item[k] += i[k]
+                      elif pd.notna(i[k]):
+                        item[k] += [i[k]]
+                  # очередня попытка удалить явные дубликаты словарей, появившиеся при объединении CV
+                  item = [{k : _deduplicate(v) for k, v in item.items()}] 
+            else:
+                  item = subset.to_dict('records') # здесь только одно CV
+            
+            if isinstance(item[0]['id_cv'], list):
+                item[0]['cv_count'] = len(item[0]['id_cv'])
+            else:
+                item[0]['cv_count'] = 1
+            del item[0]['id_cv']
+            # оставляем наиболее позднюю дату изменения CV и собираем в строку другие атрибуты
+            if isinstance(item[0]['date_modify_inner_info'], list):
+                      item[0]['date_modify_inner_info'] = max(item[0]['date_modify_inner_info'])
+            if isinstance(item[0]['date_publish'], list):
+                      item[0]['date_publish'] = max(item[0]['date_publish'])
+            if isinstance(item[0]['date_creation'], list):
+                      item[0]['date_creation'] = max(item[0]['date_creation'])
+            if isinstance(item[0]['date_last_updated'], list):
+                      item[0]['date_last_updated'] = max(item[0]['date_last_updated'])
+            if isinstance(item[0]['salary'], list):
+                      item[0]['salary'] = max(item[0]['salary'])
+            if isinstance(item[0]['experience'], list):
+                      item[0]['experience'] = max(item[0]['experience'])
+            if isinstance(item[0]['is_generated'], list):
+                      item[0]['is_generated'] = max(item[0]['is_generated'])
+            if isinstance(item[0]['education_type'], list):
+                      item[0]['education_type'] = max(item[0]['education_type'])
+            if isinstance(item[0]['responses'], list):
+                      item[0]['responses'] = sum(item[0]['responses'])
+            if isinstance(item[0]['gender'], list):
+                      item[0]['gender'] = item[0]['gender'][0]
+            if isinstance(item[0]['birthday'], list):
+                      item[0]['birthday'] = item[0]['birthday'][0]
+                      
+            if isinstance(item[0]['len_add_certificates_modified'], list):
+                      item[0]['len_add_certificates_modified'] = max(item[0]['len_add_certificates_modified'])
+            if isinstance(item[0]['len_skills'], list):
+                      item[0]['len_skills'] = max(item[0]['len_skills'])
+            if isinstance(item[0]['len_additional_skills'], list):
+                      item[0]['len_additional_skills'] = max(item[0]['len_additional_skills'])
+            if isinstance(item[0]['len_other_info_modified'], list):
+                      item[0]['len_other_info_modified'] = max(item[0]['len_other_info_modified'])
+                      
+            filtered += item
+    return filtered
+
+if __name__ == '__main__':
+    print('MAIN PROCESS')
+                   
+    base_dir = './'
+    chunksize = 100000
+    dataset_filename = 'dataset2.csv'
+    os.makedirs(base_dir, exist_ok=True)
+    
+    total_size = 0
+    with pd.read_csv(os.path.join(base_dir, dataset_filename), 
+                     chunksize=chunksize, sep='|', 
+                     parse_dates=False, dtype={'salary': 'Int64', 'responses': 'Int64',
+                                                'gender': 'Int64', 'experience': 'Int64',
+                                                'birthday': 'Int64', 'education_type': 'Int64',
+                                                'busy_type': 'Int64', 'is_generated': 'Int64',
+                                                'len_add_certificates_modified': 'Int64',
+                                                'len_skills': 'Int64', 'len_additional_skills': 'Int64',
+                                                'len_other_info_modified': 'Int64',
+                                                'region_code': 'Int64'}) as reader:
+            for chunk in tqdm(reader):
+                chunk = pd.DataFrame(process_chunk(chunk))
+                chunk.to_csv(os.path.join(base_dir, f"{dataset_filename}.clean.csv"),
+                            header=(total_size==0), mode='a', sep='|', index=False)
+                total_size += len(chunk)
+                del chunk
+    print(f"total size: {total_size}")
+    # 

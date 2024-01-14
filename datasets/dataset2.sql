@@ -1,3 +1,4 @@
+-- 29240531
 CREATE TABLE IF NOT EXISTS project_trudvsem.dataset2 AS
 	SELECT cv.id_candidate, --DISTINCT ON (id_candidate)
 									id_cv,

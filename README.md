@@ -12,10 +12,14 @@ The name of the temporary folder, e.g. workdir, must be specified in the `workin
 
 ## Datasets preparation
 
-There are two data preparation SQL scripts located in the `datasets` folder that create cleaned aggregates for:
+There are two data preparation SQL/py scripts located in the `datasets` folder that create cleaned aggregates for:
 1) A dataset on education and career trajectories
 2) A dataset on the activities of unemployed candidates
 
+The execution order:
+- execute `datasetX.sql` to create a raw data table
+- export the table to `datasetX.csv` with headers
+- execute `datasetX.py` to get the cleaned `datasetX.csv.clean.csv`
 
 ## License
 

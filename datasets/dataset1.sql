@@ -1,3 +1,4 @@
+-- 11341078
 CREATE TABLE IF NOT EXISTS project_trudvsem.agg_edu AS
 	SELECT DISTINCT ON (cv.id_cv) cv.id_cv, 
 						CONCAT('[', STRING_AGG(edu, ','), ']') AS edu, 
