@@ -18,6 +18,15 @@ def _deduplicate(x):
         return x[0]
     return x
 
+def _max(x):
+    if isinstance(x, list):
+      x = [i for i in x if pd.notna(i)]
+      if len(x):
+        x = max(x)
+      else:
+        x = np.nan
+    return x 
+
 def process_chunk(chunk):
     filtered = []
     for idx, subset in chunk.groupby(['id_candidate']):
@@ -42,37 +51,39 @@ def process_chunk(chunk):
             del item[0]['id_cv']
             # оставляем наиболее позднюю дату изменения CV и собираем в строку другие атрибуты
             if isinstance(item[0]['date_modify_inner_info'], list):
-                      item[0]['date_modify_inner_info'] = max(item[0]['date_modify_inner_info'])
+                      item[0]['date_modify_inner_info'] = _max(item[0]['date_modify_inner_info'])
             if isinstance(item[0]['date_publish'], list):
-                      item[0]['date_publish'] = max(item[0]['date_publish'])
+                      item[0]['date_publish'] = _max(item[0]['date_publish'])
             if isinstance(item[0]['date_creation'], list):
-                      item[0]['date_creation'] = max(item[0]['date_creation'])
+                      item[0]['date_creation'] = _max(item[0]['date_creation'])
             if isinstance(item[0]['date_last_updated'], list):
-                      item[0]['date_last_updated'] = max(item[0]['date_last_updated'])
+                      item[0]['date_last_updated'] = _max(item[0]['date_last_updated'])
             if isinstance(item[0]['salary'], list):
-                      item[0]['salary'] = max(item[0]['salary'])
+                      item[0]['salary'] = _max(item[0]['salary'])
             if isinstance(item[0]['experience'], list):
-                      item[0]['experience'] = max(item[0]['experience'])
+                      item[0]['experience'] = _max(item[0]['experience'])
             if isinstance(item[0]['is_generated'], list):
-                      item[0]['is_generated'] = max(item[0]['is_generated'])
+                      item[0]['is_generated'] = _max(item[0]['is_generated'])
             if isinstance(item[0]['education_type'], list):
-                      item[0]['education_type'] = max(item[0]['education_type'])
+                      item[0]['education_type'] = _max(item[0]['education_type'])
             if isinstance(item[0]['responses'], list):
-                      item[0]['responses'] = sum(item[0]['responses'])
+                      item[0]['responses'] = _max(item[0]['responses'])
             if isinstance(item[0]['gender'], list):
-                      item[0]['gender'] = item[0]['gender'][0]
+                      item[0]['gender'] = _max(item[0]['gender'])
             if isinstance(item[0]['birthday'], list):
-                      item[0]['birthday'] = item[0]['birthday'][0]
+                      item[0]['birthday'] = _max(item[0]['birthday'])
+                      
+            #if isinstance(item[0]['region_code'], list):
+            #         item[0]['region_code'] = ', '.join(item[0]['region_code'])
                       
             if isinstance(item[0]['len_add_certificates_modified'], list):
-                      item[0]['len_add_certificates_modified'] = max(item[0]['len_add_certificates_modified'])
+                      item[0]['len_add_certificates_modified'] = _max(item[0]['len_add_certificates_modified'])
             if isinstance(item[0]['len_skills'], list):
-                      item[0]['len_skills'] = max(item[0]['len_skills'])
+                      item[0]['len_skills'] = _max(item[0]['len_skills'])
             if isinstance(item[0]['len_additional_skills'], list):
-                      item[0]['len_additional_skills'] = max(item[0]['len_additional_skills'])
+                      item[0]['len_additional_skills'] = _max(item[0]['len_additional_skills'])
             if isinstance(item[0]['len_other_info_modified'], list):
-                      item[0]['len_other_info_modified'] = max(item[0]['len_other_info_modified'])
-                      
+                      item[0]['len_other_info_modified'] = _max(item[0]['len_other_info_modified'])
             filtered += item
     return filtered
 
@@ -102,4 +113,4 @@ if __name__ == '__main__':
                 total_size += len(chunk)
                 del chunk
     print(f"total size: {total_size}")
-    # 
+    # 24761724

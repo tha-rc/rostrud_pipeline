@@ -23,7 +23,9 @@ def _eval(x):
                           .replace("#", " ")\
                           .replace("№", " ")\
                           .replace(" -", "-")\
-                          .replace("- ", "-")
+                          .replace("- ", "-")\
+                          .replace(' "', '"')\
+                          .replace('" ', '"')                          
       x = _normalize_whitespace(x).strip().lower()
       x = literal_eval(x)
     return x
@@ -35,10 +37,20 @@ def _deduplicate(x):
         return np.nan
       if isinstance(x[0], dict):
         return pd.DataFrame(x).drop_duplicates().to_dict('records')
+      x = [i for i in x if pd.notna(i)]
       x = list(dict.fromkeys(x))
       if len(x) == 1:
         return x[0]
     return x
+  
+def _max(x):
+    if isinstance(x, list):
+      x = [i for i in x if pd.notna(i)]
+      if len(x):
+        x = max(x)
+      else:
+        x = np.nan
+    return x      
 
 def process_chunk(chunk):
     filtered = []
@@ -73,17 +85,17 @@ def process_chunk(chunk):
                   del item[0]['addedu']
                   # оставляем наиболее позднюю дату изменения CV и собираем в строку другие атрибуты
                   if isinstance(item[0]['date_modify_inner_info'], list):
-                      item[0]['date_modify_inner_info'] = max(item[0]['date_modify_inner_info'])
+                      item[0]['date_modify_inner_info'] = _max(item[0]['date_modify_inner_info'])
                   if isinstance(item[0]['position_name'], list):
                       item[0]['position_name'] = ', '.join(item[0]['position_name'])
                   if isinstance(item[0]['salary'], list):
-                      item[0]['salary'] = max(item[0]['salary'])
+                      item[0]['salary'] = _max(item[0]['salary'])
                   #if isinstance(item[0]['region_code'], list):
                   #    item[0]['region_code'] = ', '.join(item[0]['region_code'])
                   if isinstance(item[0]['gender'], list):
-                      item[0]['gender'] = item[0]['gender'][0]
+                      item[0]['gender'] = _max(item[0]['gender'])
                   if isinstance(item[0]['birthday'], list):
-                      item[0]['birthday'] = item[0]['birthday'][0]
+                      item[0]['birthday'] = _max(item[0]['birthday'])
                   filtered += item
     return filtered
 
