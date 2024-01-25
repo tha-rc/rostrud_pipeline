@@ -26,7 +26,7 @@ def _eval(x):
                           .replace("- ", "-")\
                           .replace(' "', '"')\
                           .replace('" ', '"')                          
-      x = _normalize_whitespace(x).strip().lower()
+      x = _normalize_whitespace(x).strip()#.lower()
       x = literal_eval(x)
     return x
 
@@ -36,7 +36,11 @@ def _deduplicate(x):
       if l == 0:
         return np.nan
       if isinstance(x[0], dict):
-        return pd.DataFrame(x).drop_duplicates().to_dict('records')
+        d = pd.DataFrame(x).drop_duplicates()
+        d_ = ~d.applymap(str.lower).duplicated()
+        if len(d) > d_.sum():
+          d = d[d_]        
+        return d.to_dict('records')
       x = [i for i in x if pd.notna(i)]
       x = list(dict.fromkeys(x))
       if len(x) == 1:
@@ -90,8 +94,8 @@ def process_chunk(chunk):
                       item[0]['position_name'] = ', '.join(item[0]['position_name'])
                   if isinstance(item[0]['salary'], list):
                       item[0]['salary'] = _max(item[0]['salary'])
-                  #if isinstance(item[0]['region_code'], list):
-                  #    item[0]['region_code'] = ', '.join(item[0]['region_code'])
+                  if isinstance(item[0]['region_code'], list):
+                      item[0]['region_code'] = ', '.join([str(int(i)) for i in item[0]['region_code']])
                   if isinstance(item[0]['gender'], list):
                       item[0]['gender'] = _max(item[0]['gender'])
                   if isinstance(item[0]['birthday'], list):

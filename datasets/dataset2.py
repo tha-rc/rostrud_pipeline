@@ -73,8 +73,8 @@ def process_chunk(chunk):
             if isinstance(item[0]['birthday'], list):
                       item[0]['birthday'] = _max(item[0]['birthday'])
                       
-            #if isinstance(item[0]['region_code'], list):
-            #         item[0]['region_code'] = ', '.join(item[0]['region_code'])
+            if isinstance(item[0]['region_code'], list):
+                     item[0]['region_code'] = ', '.join([str(int(i)) for i in item[0]['region_code']])
                       
             if isinstance(item[0]['len_add_certificates_modified'], list):
                       item[0]['len_add_certificates_modified'] = _max(item[0]['len_add_certificates_modified'])
