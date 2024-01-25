@@ -37,9 +37,9 @@ def _deduplicate(x):
         return np.nan
       if isinstance(x[0], dict):
         d = pd.DataFrame(x).drop_duplicates()
-        d_ = ~d.applymap(str.lower).duplicated()
-        if len(d) > d_.sum():
-          d = d[d_]        
+        dup = ~d.applymap(str.lower).duplicated()
+        if len(d) > dup.sum():
+          d = d[dup]        
         return d.to_dict('records')
       x = [i for i in x if pd.notna(i)]
       x = list(dict.fromkeys(x))
