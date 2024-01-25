@@ -113,6 +113,9 @@ if __name__ == '__main__':
     from pandarallel import pandarallel
     pandarallel.initialize(progress_bar=False)
     
+    edu_cols = ['id_candidate', 'legal_name', 'graduate_year', 'faculty', 'qualification', 'speciality', 'course_name', 'description']
+    workexp_cols = ['id_candidate', 'company_name', 'date_from', 'date_to', 'job_title']
+    
     total_size = 0
     with pd.read_csv(os.path.join(base_dir, dataset_filename), 
                      chunksize=chunksize, sep='|', 
@@ -126,8 +129,34 @@ if __name__ == '__main__':
                                                                             }) as reader:
             for chunk in tqdm(reader):
                 chunk = pd.DataFrame(process_chunk(chunk))
+                
                 chunk.to_csv(os.path.join(base_dir, f"{dataset_filename}.clean.csv"),
                             header=(total_size==0), mode='a', sep='|', index=False)
+                
+                chunk.drop(['edu', 'workexp'], axis=1).to_csv(os.path.join(base_dir, f"{dataset_filename}.cand.clean.csv"),
+                            header=(total_size==0), mode='a', sep='|', index=False)
+                
+                for idx, items in chunk.iterrows():
+                  if isinstance(items['edu'], (list, dict)):
+                    edu = pd.DataFrame(items['edu'], dtype=str)
+                    edu['id_candidate'] = items['id_candidate']
+                    for c in edu_cols:
+                      if c not in edu:
+                        edu[c] = np.nan
+                    edu[edu_cols].to_csv(os.path.join(base_dir, f"{dataset_filename}.edu.clean.csv"),
+                            header=(total_size==0), mode='a', sep='|', index=False)
+                    del edu
+                    
+                  if isinstance(items['workexp'], (list, dict)):
+                    workexp = pd.DataFrame(items['workexp'], dtype=str)
+                    workexp['id_candidate'] = items['id_candidate']
+                    for c in workexp_cols:
+                      if c not in workexp:
+                        workexp[c] = np.nan
+                    workexp[workexp_cols].to_csv(os.path.join(base_dir, f"{dataset_filename}.workexp.clean.csv"),
+                            header=(total_size==0), mode='a', sep='|', index=False)
+                    del workexp
+                
                 total_size += len(chunk)
                 del chunk
     print(f"total size: {total_size}")
