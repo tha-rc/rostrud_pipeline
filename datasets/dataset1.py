@@ -115,6 +115,10 @@ if __name__ == '__main__':
     
     edu_cols = ['id_candidate', 'legal_name', 'graduate_year', 'faculty', 'qualification', 'speciality', 'course_name', 'description']
     workexp_cols = ['id_candidate', 'company_name', 'date_from', 'date_to', 'job_title']
+    clean_filename = os.path.join(base_dir, f"{dataset_filename}.clean.csv")
+    cand_filename = os.path.join(base_dir, f"{dataset_filename}.cand.clean.csv")
+    edu_filename = os.path.join(base_dir, f"{dataset_filename}.edu.clean.csv")
+    workexp_filename = os.path.join(base_dir, f"{dataset_filename}.workexp.clean.csv")
     
     total_size = 0
     with pd.read_csv(os.path.join(base_dir, dataset_filename), 
@@ -130,10 +134,10 @@ if __name__ == '__main__':
             for chunk in tqdm(reader):
                 chunk = pd.DataFrame(process_chunk(chunk))
                 
-                chunk.to_csv(os.path.join(base_dir, f"{dataset_filename}.clean.csv"),
+                chunk.to_csv(clean_filename,
                             header=(total_size==0), mode='a', sep='|', index=False)
                 
-                chunk.drop(['edu', 'workexp'], axis=1).to_csv(os.path.join(base_dir, f"{dataset_filename}.cand.clean.csv"),
+                chunk.drop(['edu', 'workexp'], axis=1).to_csv(cand_filename,
                             header=(total_size==0), mode='a', sep='|', index=False)
                 
                 for idx, items in chunk.iterrows():
@@ -143,8 +147,8 @@ if __name__ == '__main__':
                     for c in edu_cols:
                       if c not in edu:
                         edu[c] = np.nan
-                    edu[edu_cols].to_csv(os.path.join(base_dir, f"{dataset_filename}.edu.clean.csv"),
-                            header=(total_size==0), mode='a', sep='|', index=False)
+                    edu[edu_cols].to_csv(edu_filename,
+                            header=(not os.path.exists(edu_filename)), mode='a', sep='|', index=False)
                     del edu
                     
                   if isinstance(items['workexp'], (list, dict)):
@@ -153,8 +157,8 @@ if __name__ == '__main__':
                     for c in workexp_cols:
                       if c not in workexp:
                         workexp[c] = np.nan
-                    workexp[workexp_cols].to_csv(os.path.join(base_dir, f"{dataset_filename}.workexp.clean.csv"),
-                            header=(total_size==0), mode='a', sep='|', index=False)
+                    workexp[workexp_cols].to_csv(workexp_filename,
+                            header=(not os.path.exists(workexp_filename)), mode='a', sep='|', index=False)
                     del workexp
                 
                 total_size += len(chunk)
