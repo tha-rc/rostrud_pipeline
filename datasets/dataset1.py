@@ -24,7 +24,8 @@ def _rem(x):
                           .replace(" -", "-")\
                           .replace("- ", "-")\
                           .replace(' "', '"')\
-                          .replace('" ', '"')
+                          .replace('" ', '"')\
+                          .replace("”", " ")
 
 def _eval(x):
     if pd.notna(x):
