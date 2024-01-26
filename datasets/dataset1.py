@@ -8,7 +8,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 def _normalize_whitespace(s):
-    return re.sub(r'(\s)\1{1,}', r'\1', s).strip().replace(' ,', ',') 
+    return re.sub(r'(\s)\1{1,}', r'\1', s).strip().replace(' ,', ',').replace(' ;', ';') 
   
 def _rem(x):
     return x.replace("\r", " ")\
