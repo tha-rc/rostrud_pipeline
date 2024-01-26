@@ -8,7 +8,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 def _normalize_whitespace(s):
-    return re.sub(r'(\s)\1{1,}', r'\1', s).strip()
+    return re.sub(r'(\s)\1{1,}', r'\1', s).strip().replace(' ,', ',') 
   
 def _rem(x):
     return x.replace("\r", " ")\
@@ -24,7 +24,7 @@ def _rem(x):
                           .replace(" -", "-")\
                           .replace("- ", "-")\
                           .replace(' "', '"')\
-                          .replace('" ', '"') 
+                          .replace('" ', '"')
 
 def _eval(x):
     if pd.notna(x):
