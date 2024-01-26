@@ -8,7 +8,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 def _normalize_whitespace(s):
-    return re.sub(r'(\s)\1{1,}', r'\1', s).strip().replace(' ,', ',').replace(' ;', ';') 
+    return re.sub(r'(\s)\1{1,}', r'\1', s).strip().replace(' ,', ',').replace(' ;', ';').replace(' :', ':') 
   
 def _rem(x):
     return x.replace("\r", " ")\
@@ -69,7 +69,7 @@ def process_chunk(chunk):
     chunk['addedu'] = chunk['addedu'].parallel_apply(_deduplicate) 
     chunk['edu'] = chunk['edu'].parallel_apply(_deduplicate) 
     chunk['workexp'] = chunk['workexp'].parallel_apply(_deduplicate)
-    chunk['position_name'] = chunk['position_name'].parallel_apply(lambda x: _normalize_whitespace(_rem(str(x)).replace("'", " ")) if pd.notna(x) else x)
+    chunk['position_name'] = chunk['position_name'].parallel_apply(lambda x: _normalize_whitespace(_rem(str(x)).replace("'", " ").replace('"', ' ')) if pd.notna(x) else x)
     
     for idx, subset in chunk.groupby(['id_candidate']):
               if len(subset) > 1: # если есть несколько CV, то собираем в одну запись всю информацию
