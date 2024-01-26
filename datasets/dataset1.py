@@ -85,7 +85,7 @@ def process_chunk(chunk):
                   if isinstance(item[0]['edu'], list) and isinstance(item[0]['addedu'], list):
                     item[0]['edu'] = item[0]['edu'] + item[0]['addedu']
                   elif not isinstance(item[0]['edu'], list) and isinstance(item[0]['addedu'], list):
-                    item[0]['edu'] = item[0]['addedu']
+                    item[0]['edu'] = item[0]['addedu'].copy()
                   del item[0]['addedu']
                   # оставляем наиболее позднюю дату изменения CV и собираем в строку другие атрибуты
                   if isinstance(item[0]['date_modify_inner_info'], list):
@@ -134,34 +134,35 @@ if __name__ == '__main__':
             for chunk in tqdm(reader):
                 chunk = pd.DataFrame(process_chunk(chunk))
                 
-                chunk.to_csv(clean_filename,
-                            header=(total_size==0), mode='a', sep='|', index=False)
-                
-                chunk.drop(['edu', 'workexp'], axis=1).to_csv(cand_filename,
-                            header=(total_size==0), mode='a', sep='|', index=False)
-                
-                for idx, items in chunk.iterrows():
-                  if isinstance(items['edu'], (list, dict)):
-                    edu = pd.DataFrame(items['edu'], dtype=str)
-                    edu['id_candidate'] = items['id_candidate']
-                    for c in edu_cols:
-                      if c not in edu:
-                        edu[c] = np.nan
-                    edu[edu_cols].to_csv(edu_filename,
-                            header=(not os.path.exists(edu_filename)), mode='a', sep='|', index=False)
-                    del edu
-                    
-                  if isinstance(items['workexp'], (list, dict)):
-                    workexp = pd.DataFrame(items['workexp'], dtype=str)
-                    workexp['id_candidate'] = items['id_candidate']
-                    for c in workexp_cols:
-                      if c not in workexp:
-                        workexp[c] = np.nan
-                    workexp[workexp_cols].to_csv(workexp_filename,
-                            header=(not os.path.exists(workexp_filename)), mode='a', sep='|', index=False)
-                    del workexp
-                
-                total_size += len(chunk)
-                del chunk
+                if len(chunk):
+                  chunk.to_csv(clean_filename,
+                              header=(total_size==0), mode='a', sep='|', index=False)
+                  
+                  chunk.drop(['edu', 'workexp'], axis=1, errors='ignore').to_csv(cand_filename,
+                              header=(total_size==0), mode='a', sep='|', index=False)
+                  
+                  for idx, items in chunk.iterrows():
+                    if 'edu' in items and isinstance(items['edu'], (list, dict)):
+                      edu = pd.DataFrame(items['edu'], dtype=str)
+                      edu['id_candidate'] = items['id_candidate']
+                      for c in edu_cols:
+                        if c not in edu:
+                          edu[c] = np.nan
+                      edu[edu_cols].to_csv(edu_filename,
+                              header=(not os.path.exists(edu_filename)), mode='a', sep='|', index=False)
+                      del edu
+                      
+                    if 'workexp' in items and isinstance(items['workexp'], (list, dict)):
+                      workexp = pd.DataFrame(items['workexp'], dtype=str)
+                      workexp['id_candidate'] = items['id_candidate']
+                      for c in workexp_cols:
+                        if c not in workexp:
+                          workexp[c] = np.nan
+                      workexp[workexp_cols].to_csv(workexp_filename,
+                              header=(not os.path.exists(workexp_filename)), mode='a', sep='|', index=False)
+                      del workexp
+                  
+                  total_size += len(chunk)
+                  del chunk
     print(f"total size: {total_size}")
     # total size: 6221448
