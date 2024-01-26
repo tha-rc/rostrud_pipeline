@@ -152,7 +152,8 @@ if __name__ == '__main__':
                         if c not in edu:
                           edu[c] = np.nan
                         else:
-                          edu[c] = edu[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
+                          if 'date' not in c and 'id' not in c:
+                            edu[c] = edu[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
                       edu[edu_cols].to_csv(edu_filename,
                               header=(not os.path.exists(edu_filename)), mode='a', sep='|', index=False)
                       del edu
@@ -164,7 +165,8 @@ if __name__ == '__main__':
                         if c not in workexp:
                           workexp[c] = np.nan
                         else:
-                          workexp[c] = workexp[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
+                          if 'date' not in c and 'id' not in c:
+                            workexp[c] = workexp[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
                       workexp[workexp_cols].to_csv(workexp_filename,
                               header=(not os.path.exists(workexp_filename)), mode='a', sep='|', index=False)
                       del workexp
