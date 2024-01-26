@@ -66,7 +66,7 @@ def process_chunk(chunk):
     chunk['addedu'] = chunk['addedu'].parallel_apply(_deduplicate) 
     chunk['edu'] = chunk['edu'].parallel_apply(_deduplicate) 
     chunk['workexp'] = chunk['workexp'].parallel_apply(_deduplicate)
-    chunk['position_name'] = chunk['position_name'].str.lower()
+    chunk['position_name'] = chunk['position_name'].parallel_apply(lambda x: _normalize_whitespace(_rem(str(x)).replace("'", " ").lower()) if pd.notna(x) else x)
     
     for idx, subset in chunk.groupby(['id_candidate']):
               if len(subset) > 1: # если есть несколько CV, то собираем в одну запись всю информацию
