@@ -8,11 +8,10 @@ import warnings
 warnings.filterwarnings("ignore")
 
 def _normalize_whitespace(s):
-    return re.sub(r'(\s)\1{1,}', r'\1', s)
-
-def _eval(x):
-    if pd.notna(x):
-      x = str(x).replace("\r", " ")\
+    return re.sub(r'(\s)\1{1,}', r'\1', s).strip()
+  
+def _rem(x):
+    return x.replace("\r", " ")\
                           .replace("\t", " ")\
                           .replace("\n", " ")\
                           .replace("\\", "/")\
@@ -25,8 +24,12 @@ def _eval(x):
                           .replace(" -", "-")\
                           .replace("- ", "-")\
                           .replace(' "', '"')\
-                          .replace('" ', '"')                          
-      x = _normalize_whitespace(x).strip()#.lower()
+                          .replace('" ', '"') 
+
+def _eval(x):
+    if pd.notna(x):
+      x = _rem(str(x))                        
+      x = _normalize_whitespace(x)#.lower()
       x = literal_eval(x)
     return x
 
@@ -148,6 +151,8 @@ if __name__ == '__main__':
                       for c in edu_cols:
                         if c not in edu:
                           edu[c] = np.nan
+                        else:
+                          edu[c] = edu[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
                       edu[edu_cols].to_csv(edu_filename,
                               header=(not os.path.exists(edu_filename)), mode='a', sep='|', index=False)
                       del edu
@@ -158,6 +163,8 @@ if __name__ == '__main__':
                       for c in workexp_cols:
                         if c not in workexp:
                           workexp[c] = np.nan
+                        else:
+                          workexp[c] = workexp[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
                       workexp[workexp_cols].to_csv(workexp_filename,
                               header=(not os.path.exists(workexp_filename)), mode='a', sep='|', index=False)
                       del workexp
