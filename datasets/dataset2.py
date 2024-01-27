@@ -88,7 +88,6 @@ def process_chunk(chunk):
     return filtered
 
 if __name__ == '__main__':
-    print('MAIN PROCESS')
                    
     base_dir = './'
     chunksize = 100000
