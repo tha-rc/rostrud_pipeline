@@ -10,15 +10,12 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
-    # print('MAIN PROCESS')
-                   
+                  
     base_dir = './'
     chunksize = 100000
     dataset_filename = 'dataset1.csv'
     os.makedirs(base_dir, exist_ok=True)
 
-    #edu_cols = ['id_candidate', 'legal_name', 'graduate_year', 'faculty', 'qualification', 'speciality', 'course_name', 'description']
-    #workexp_cols = ['id_candidate', 'company_name', 'date_from', 'date_to', 'job_title']
     clean_filename = os.path.join(base_dir, f"{dataset_filename}.clean.csv")
     index_file = os.path.join(base_dir, f"{dataset_filename}.index.csv")
     

@@ -1,4 +1,6 @@
 import re, os
+import hashlib
+import functools
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -44,7 +46,7 @@ def _deduplicate(x):
         return np.nan
       if isinstance(x[0], dict):
         d = pd.DataFrame(x).drop_duplicates()
-        dup = ~d.applymap(str.lower).duplicated()
+        dup = ~d.applymap(lambda x: ''.join([i for i in str(x).lower() if i.isalnum()])).duplicated()
         if len(d) > dup.sum():
           d = d[dup]        
         return d.to_dict('records')
@@ -61,15 +63,33 @@ def _max(x):
         x = max(x)
       else:
         x = np.nan
-    return x      
+    return x   
+  
+def _check(x):
+    x = dict(x)
+    x.pop('id_candidate', None)
+    x.pop('graduate_year', None)
+    x.pop('date_from', None)
+    x.pop('date_to', None)
+    return bool(sum([len(str(i)) for i in x.values() if pd.notna(i)]) > 3)
+
+@functools.cache
+def _hash(x):
+    return hashlib.shake_128(str(x).encode()).hexdigest(4)
+  
+@functools.cache
+def _clean(x):
+    return _normalize_whitespace(_rem(str(x)).replace("'", " ").replace('"', ' ')) if pd.notna(x) else x
 
 def process_chunk(chunk):
     filtered = []
+    # rehash
+    chunk['id_candidate'] = chunk['id_candidate'].parallel_apply(_hash)
     # попытка удалить явные дубликаты словарей внутри CV и пустые списки   
     chunk['addedu'] = chunk['addedu'].parallel_apply(_deduplicate) 
     chunk['edu'] = chunk['edu'].parallel_apply(_deduplicate) 
     chunk['workexp'] = chunk['workexp'].parallel_apply(_deduplicate)
-    chunk['position_name'] = chunk['position_name'].parallel_apply(lambda x: _normalize_whitespace(_rem(str(x)).replace("'", " ").replace('"', ' ')) if pd.notna(x) else x)
+    chunk['position_name'] = chunk['position_name'].parallel_apply(_clean)
     
     for idx, subset in chunk.groupby(['id_candidate']):
               if len(subset) > 1: # если есть несколько CV, то собираем в одну запись всю информацию
@@ -114,7 +134,7 @@ if __name__ == '__main__':
     print('MAIN PROCESS')
                    
     base_dir = './'
-    chunksize = 100000
+    chunksize = 1000
     dataset_filename = 'dataset1.csv'
     os.makedirs(base_dir, exist_ok=True)
     from pandarallel import pandarallel
@@ -145,7 +165,7 @@ if __name__ == '__main__':
                   chunk.to_csv(clean_filename,
                               header=(total_size==0), mode='a', sep='|', index=False)
                   
-                  chunk.drop(['edu', 'workexp'], axis=1, errors='ignore').to_csv(cand_filename,
+                  chunk.drop(['edu', 'workexp'], axis=1, errors='ignore').drop_duplicates().to_csv(cand_filename,
                               header=(total_size==0), mode='a', sep='|', index=False)
                   
                   for idx, items in chunk.iterrows():
@@ -158,7 +178,10 @@ if __name__ == '__main__':
                         else:
                           if 'date' not in c and 'id' not in c:
                             edu[c] = edu[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
-                      edu[edu_cols].to_csv(edu_filename,
+                      edu = edu[edu_cols]
+                      edu = edu[edu.parallel_apply(_check, axis=1)]
+                      edu.drop_duplicates(inplace=True)
+                      edu.to_csv(edu_filename,
                               header=(not os.path.exists(edu_filename)), mode='a', sep='|', index=False)
                       del edu
                       
@@ -171,7 +194,10 @@ if __name__ == '__main__':
                         else:
                           if 'date' not in c and 'id' not in c:
                             workexp[c] = workexp[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
-                      workexp[workexp_cols].to_csv(workexp_filename,
+                      workexp = workexp[workexp_cols]
+                      workexp = workexp[workexp.parallel_apply(_check, axis=1)]
+                      workexp.drop_duplicates(inplace=True)
+                      workexp.to_csv(workexp_filename,
                               header=(not os.path.exists(workexp_filename)), mode='a', sep='|', index=False)
                       del workexp
                   

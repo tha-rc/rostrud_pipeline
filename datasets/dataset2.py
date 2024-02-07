@@ -1,4 +1,6 @@
 import os
+import hashlib
+import functools
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -26,9 +28,16 @@ def _max(x):
       else:
         x = np.nan
     return x 
+  
+@functools.cache
+def _hash(x):
+    return hashlib.shake_128(str(x).encode()).hexdigest(4)
 
 def process_chunk(chunk):
     filtered = []
+    # rehash
+    chunk['id_candidate'] = chunk['id_candidate'].parallel_apply(_hash)
+    
     for idx, subset in chunk.groupby(['id_candidate']):
             if len(subset) > 1: # если есть несколько CV, то собираем в одну запись всю информацию
                   subset = subset.to_dict('records')
@@ -88,11 +97,14 @@ def process_chunk(chunk):
     return filtered
 
 if __name__ == '__main__':
+    print('MAIN PROCESS')
                    
     base_dir = './'
-    chunksize = 100000
+    chunksize = 250000
     dataset_filename = 'dataset2.csv'
     os.makedirs(base_dir, exist_ok=True)
+    from pandarallel import pandarallel
+    pandarallel.initialize(progress_bar=False)
     
     total_size = 0
     with pd.read_csv(os.path.join(base_dir, dataset_filename), 
@@ -113,3 +125,4 @@ if __name__ == '__main__':
                 del chunk
     print(f"total size: {total_size}")
     # 24761724
+    # 22582133
