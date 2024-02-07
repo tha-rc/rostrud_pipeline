@@ -66,12 +66,7 @@ def _max(x):
     return x   
   
 def _check(x):
-    x = dict(x)
-    x.pop('id_candidate', None)
-    x.pop('graduate_year', None)
-    x.pop('date_from', None)
-    x.pop('date_to', None)
-    return bool(sum([len(str(i)) for i in x.values() if pd.notna(i)]) > 3)
+    return len(x.str.cat()) > 3
 
 @functools.cache
 def _hash(x):
@@ -134,7 +129,7 @@ if __name__ == '__main__':
     print('MAIN PROCESS')
                    
     base_dir = './'
-    chunksize = 150000
+    chunksize = 50000
     dataset_filename = 'dataset1.csv'
     os.makedirs(base_dir, exist_ok=True)
     from pandarallel import pandarallel
@@ -142,6 +137,10 @@ if __name__ == '__main__':
     
     edu_cols = ['id_candidate', 'legal_name', 'graduate_year', 'faculty', 'qualification', 'speciality', 'course_name', 'description']
     workexp_cols = ['id_candidate', 'company_name', 'date_from', 'date_to', 'job_title']
+    
+    check_edu_cols = ['legal_name', 'faculty', 'qualification', 'speciality', 'course_name', 'description']
+    check_workexp_cols = ['company_name', 'job_title']    
+    
     clean_filename = os.path.join(base_dir, f"{dataset_filename}.clean.csv")
     cand_filename = os.path.join(base_dir, f"{dataset_filename}.cand.clean.csv")
     edu_filename = os.path.join(base_dir, f"{dataset_filename}.edu.clean.csv")
@@ -179,7 +178,7 @@ if __name__ == '__main__':
                           if 'date' not in c and 'id' not in c:
                             edu[c] = edu[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
                       edu = edu[edu_cols]
-                      edu = edu[edu.parallel_apply(_check, axis=1)]
+                      edu = edu[edu[check_edu_cols].apply(_check, axis=1)]
                       edu.drop_duplicates(inplace=True)
                       edu.to_csv(edu_filename,
                               header=(not os.path.exists(edu_filename)), mode='a', sep='|', index=False)
@@ -195,7 +194,7 @@ if __name__ == '__main__':
                           if 'date' not in c and 'id' not in c:
                             workexp[c] = workexp[c].apply(lambda x: _normalize_whitespace(str(x).replace("'", " ")) if pd.notna(x) else x)
                       workexp = workexp[workexp_cols]
-                      workexp = workexp[workexp.parallel_apply(_check, axis=1)]
+                      workexp = workexp[workexp[check_workexp_cols].apply(_check, axis=1)]
                       workexp.drop_duplicates(inplace=True)
                       workexp.to_csv(workexp_filename,
                               header=(not os.path.exists(workexp_filename)), mode='a', sep='|', index=False)
