@@ -134,7 +134,7 @@ if __name__ == '__main__':
     print('MAIN PROCESS')
                    
     base_dir = './'
-    chunksize = 1000
+    chunksize = 150000
     dataset_filename = 'dataset1.csv'
     os.makedirs(base_dir, exist_ok=True)
     from pandarallel import pandarallel
