@@ -112,7 +112,7 @@ if __name__ == '__main__':
                     'busy_type', 'education_type', 'region_code', 'salary',
                     'date_creation', 'date_publish', 'date_modify_inner_info', 'date_last_updated',
                     'responses', 'len_add_certificates_modified', 'len_skills', 'len_additional_skills',
-       'len_other_info_modified', 'is_generated', 'cv_count']
+                    'len_other_info_modified', 'is_generated', 'cv_count']
     
     total_size = 0
     with pd.read_csv(os.path.join(base_dir, dataset_filename), 
@@ -127,7 +127,8 @@ if __name__ == '__main__':
                                                 'region_code': 'Int64'}) as reader:
             for chunk in tqdm(reader):
                 chunk = pd.DataFrame(process_chunk(chunk))
-                chunk[allowed_cols].drop_duplicates().astype({'salary': 'Int64', 'responses': 'Int64',
+                if len(chunk) and 'id_candidate' in chunk:
+                  chunk[allowed_cols].drop_duplicates().astype({'salary': 'Int64', 'responses': 'Int64',
                                                 'gender': 'Int64', 'experience': 'Int64',
                                                 'birthday': 'Int64', 'education_type': 'Int64',
                                                 'busy_type': 'Int64', 'is_generated': 'Int64',
