@@ -29,8 +29,8 @@ if __name__ == '__main__':
     dup = data[dup_idx].copy()
     data = data[~dup_idx]
     print(f'duplicated {cand_filename_in}: {len(dup)}')
-    dup.sort_values(by='date_modify_inner_info', ascending=True, inplace=True)
-    dup = dup[dup.id_candidate.duplicated()]
+    dup.sort_values(by=['birthday', 'date_modify_inner_info'], ascending=True, inplace=True)
+    dup = dup[~dup.id_candidate.duplicated()]
     data = pd.concat([data, dup], ignore_index=True)
     data.to_csv(os.path.join(base_dir, cand_filename_out), sep='|', index=False)
     print(f'size of {cand_filename_out}: {len(data)}')

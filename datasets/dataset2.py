@@ -98,15 +98,11 @@ def process_chunk(chunk):
     return filtered
 
 if __name__ == '__main__':
-    print('MAIN PROCESS')
-                   
+                     
     base_dir = './'
-    chunksize = 200000
+    chunksize = 3000000
     dataset_filename = 'dataset2.csv'
     os.makedirs(base_dir, exist_ok=True)
-
-    from pandarallel import pandarallel
-    pandarallel.initialize(progress_bar=False)
 
     allowed_cols = ['id_candidate', 'birthday', 'gender', 'experience', 
                     'busy_type', 'education_type', 'region_code', 'salary',
@@ -141,7 +137,4 @@ if __name__ == '__main__':
                 total_size += len(chunk)
                 del chunk
     print(f"total size: {total_size}")
-    # 24761724
-    # 22582133
-    # 23290531
-    # 23290984
+    # 12229087
