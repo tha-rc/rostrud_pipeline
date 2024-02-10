@@ -226,6 +226,4 @@ if __name__ == '__main__':
                   total_size += len(chunk)
                   del chunk
     print(f"total size: {total_size}")
-    # 6221448
-    # 6221357
-    # 6221456
+    # 6221443
