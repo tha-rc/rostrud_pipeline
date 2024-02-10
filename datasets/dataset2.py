@@ -31,14 +31,15 @@ def _max(x):
   
 @functools.cache
 def _hash(x):
-    return hashlib.shake_128(str(x).encode()).hexdigest(4)
+    return hashlib.shake_128(str(x).encode()).hexdigest(10)
 
 def process_chunk(chunk):
     filtered = []
     # rehash
-    chunk['id_candidate'] = chunk['id_candidate'].parallel_apply(_hash)
+    # chunk['id_candidate'] = chunk['id_candidate'].parallel_apply(_hash)
     
     for idx, subset in chunk.groupby(['id_candidate']):
+            
             if len(subset) > 1: # если есть несколько CV, то собираем в одну запись всю информацию
                   subset = subset.to_dict('records')
                   item = {k : [] for k in subset[0].keys()}
@@ -52,7 +53,7 @@ def process_chunk(chunk):
                   item = [{k : _deduplicate(v) for k, v in item.items()}] 
             else:
                   item = subset.to_dict('records') # здесь только одно CV
-            
+
             if isinstance(item[0]['id_cv'], list):
                 item[0]['cv_count'] = len(item[0]['id_cv'])
             else:
@@ -75,16 +76,16 @@ def process_chunk(chunk):
                       item[0]['is_generated'] = _max(item[0]['is_generated'])
             if isinstance(item[0]['education_type'], list):
                       item[0]['education_type'] = _max(item[0]['education_type'])
+            if isinstance(item[0]['busy_type'], list):
+                      item[0]['busy_type'] = _max(item[0]['busy_type'])
             if isinstance(item[0]['responses'], list):
                       item[0]['responses'] = _max(item[0]['responses'])
             if isinstance(item[0]['gender'], list):
                       item[0]['gender'] = _max(item[0]['gender'])
             if isinstance(item[0]['birthday'], list):
-                      item[0]['birthday'] = _max(item[0]['birthday'])
-                      
+                      item[0]['birthday'] = _max(item[0]['birthday'])        
             if isinstance(item[0]['region_code'], list):
-                     item[0]['region_code'] = ', '.join([str(int(i)) for i in item[0]['region_code']])
-                      
+                     item[0]['region_code'] = ', '.join([str(int(i)) for i in item[0]['region_code']])                     
             if isinstance(item[0]['len_add_certificates_modified'], list):
                       item[0]['len_add_certificates_modified'] = _max(item[0]['len_add_certificates_modified'])
             if isinstance(item[0]['len_skills'], list):
@@ -100,11 +101,18 @@ if __name__ == '__main__':
     print('MAIN PROCESS')
                    
     base_dir = './'
-    chunksize = 250000
+    chunksize = 200000
     dataset_filename = 'dataset2.csv'
     os.makedirs(base_dir, exist_ok=True)
+
     from pandarallel import pandarallel
     pandarallel.initialize(progress_bar=False)
+
+    allowed_cols = ['id_candidate', 'birthday', 'gender', 'experience', 
+                    'busy_type', 'education_type', 'region_code', 'salary',
+                    'date_creation', 'date_publish', 'date_modify_inner_info', 'date_last_updated',
+                    'responses', 'len_add_certificates_modified', 'len_skills', 'len_additional_skills',
+       'len_other_info_modified', 'is_generated', 'cv_count']
     
     total_size = 0
     with pd.read_csv(os.path.join(base_dir, dataset_filename), 
@@ -119,10 +127,20 @@ if __name__ == '__main__':
                                                 'region_code': 'Int64'}) as reader:
             for chunk in tqdm(reader):
                 chunk = pd.DataFrame(process_chunk(chunk))
-                chunk.to_csv(os.path.join(base_dir, f"{dataset_filename}.clean.csv"),
+                chunk[allowed_cols].drop_duplicates().astype({'salary': 'Int64', 'responses': 'Int64',
+                                                'gender': 'Int64', 'experience': 'Int64',
+                                                'birthday': 'Int64', 'education_type': 'Int64',
+                                                'busy_type': 'Int64', 'is_generated': 'Int64',
+                                                'len_add_certificates_modified': 'Int64',
+                                                'len_skills': 'Int64', 'len_additional_skills': 'Int64',
+                                                'len_other_info_modified': 'Int64', 'cv_count': 'Int64',
+                                                #'region_code': str,
+                                                }).to_csv(os.path.join(base_dir, f"{dataset_filename}.clean.csv"),
                             header=(total_size==0), mode='a', sep='|', index=False)
                 total_size += len(chunk)
                 del chunk
     print(f"total size: {total_size}")
     # 24761724
     # 22582133
+    # 23290531
+    # 23290984

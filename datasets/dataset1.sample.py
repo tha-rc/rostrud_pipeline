@@ -1,4 +1,4 @@
-import os
+import os, sys
 import json
 import bisect
 import numpy as np
@@ -10,9 +10,9 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
-                  
+             
     base_dir = './'
-    chunksize = 100000
+    chunksize = 200000
     dataset_filename = 'dataset1.csv'
     os.makedirs(base_dir, exist_ok=True)
 
@@ -23,7 +23,6 @@ if __name__ == '__main__':
     edu_filename = os.path.join(base_dir, f"{dataset_filename}.edu.clean.csv")
     workexp_filename = os.path.join(base_dir, f"{dataset_filename}.workexp.clean.csv")
     
-    total_size = 0
     if not os.path.exists(index_file):
         statistics = {}
         with pd.read_csv(clean_filename, 
@@ -36,29 +35,37 @@ if __name__ == '__main__':
                             i += len(str(items['edu']))
                         if 'workexp' in items and isinstance(items['workexp'], (list, dict, str)):
                             i += len(str(items['workexp']))
+                        if i> 1000000:
+                            print(items)
                         statistics[items['id_candidate']] = i
-                    total_size += len(chunk)
                     del chunk
                     #break
-        print(f"total size: {total_size}")
-        statistics = pd.DataFrame().from_dict(statistics, orient='index').reset_index().rename(columns={0: 'value'})
-        _, bins = np.histogram(statistics['value'], bins=500)
-        statistics['bin'] = statistics['value'].apply(lambda x: bisect.bisect(bins, x) - 1)
-        
-        filter = statistics['bin'].value_counts()
-        filter = set(filter[filter > 3].index)
-
-        statistics = statistics[statistics['bin'].apply(lambda x: x in filter)]
-        _, sample = train_test_split(statistics, test_size=min(len(filter), 200), random_state=13, stratify=statistics['bin'])
-        sample = sample['index'].to_list()
         with open(index_file, 'w') as f:
-            json.dump(sample, f)
-        del statistics
-        del filter
-        del bins
+            json.dump(statistics, f)
     else:
         with open(index_file, 'r') as f:
-            sample = json.load(f)
+            statistics = json.load(f)
+    
+    statistics = pd.DataFrame().from_dict(statistics, orient='index').reset_index().rename(columns={0: 'value'})
+    print(f"total size: {len(statistics)}")
+
+    _, bins = np.histogram(statistics['value'], bins=300)
+    statistics['bin'] = statistics['value'].apply(lambda x: bins[bisect.bisect(bins, x) - 1])
+        
+    filter = statistics['bin'].value_counts()
+    filter = set(filter[filter > 3].index)
+    print(f"filtered bins: {len(filter)}")
+
+    statistics = statistics[statistics['bin'].apply(lambda x: x in filter)]
+    print(f"filtered subset: {len(statistics)}")
+        
+    _, sample = train_test_split(statistics, test_size=max(len(filter), 200), random_state=13, stratify=statistics['bin'])
+    sample = sample['index'].to_list()
+
+    del statistics
+    del filter
+    del bins
+
     sample = set(sample)
     print(f"sample size: {len(sample)}")
 
