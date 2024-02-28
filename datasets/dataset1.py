@@ -177,7 +177,7 @@ if __name__ == '__main__':
     workexp_cols = ['id_candidate', 'company_name', 'date_from', 'date_to', 'job_title']
     edu_cols = ['id_candidate', 'legal_name', 'graduate_year', 'faculty', 'qualification', 'speciality', 'course_name', 'description']
 
-    clean_filename = os.path.join(base_dir, f"{dataset_filename}.clean.csv")
+    # clean_filename = os.path.join(base_dir, f"{dataset_filename}.clean.csv")
     cand_filename = os.path.join(base_dir, f"{dataset_filename}.cand.clean.csv")
     edu_filename = os.path.join(base_dir, f"{dataset_filename}.edu.clean.csv")
     workexp_filename = os.path.join(base_dir, f"{dataset_filename}.workexp.clean.csv")
@@ -197,15 +197,17 @@ if __name__ == '__main__':
                 chunk = pd.DataFrame(process_chunk(chunk))
                 
                 if len(chunk):
-                  chunk.to_csv(clean_filename,
-                              header=(total_size==0), mode='a', sep='|', index=False)
-                  
-                  chunk[cand_cols].drop_duplicates().astype({'salary': 'Int64',
+                  # chunk.to_csv(clean_filename,
+                  #            header=(total_size==0), mode='a', sep='|', index=False)
+                  cand = chunk[cand_cols].drop_duplicates().astype({'salary': 'Int64',
                                                                             'gender': 'Int64',
                                                                             'birthday': 'Int64',
                                                                             #'region_code': str,
-                                                                            }).to_csv(cand_filename,
+                                                                            })
+                  cand['birthday'] = cand['birthday'].parallel_apply(lambda x: x if x >= 1917 else np.nan)
+                  cand.to_csv(cand_filename,
                               header=(total_size==0), mode='a', sep='|', index=False)
+                  del cand
                   
                   edu = []
                   for item in chunk.parallel_apply(get_edu, axis=1, result_type='expand').values:
