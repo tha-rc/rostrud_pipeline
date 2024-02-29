@@ -102,8 +102,7 @@ def process_chunk(chunk):
                   item = [{k : _deduplicate(v) for k, v in item.items()}] 
               else:
                   item = subset.to_dict('records') # здесь только одно CV
-              if item[0]['id_cv'] == '57ee7ca0-4b9d-11ee-a09b-95925ccb94dc':
-                  print(item)
+              print(item)
               # фильтруем только кандидатов, указавших информацию
               if isinstance(item[0]['edu'], list) or isinstance(item[0]['addedu'], list) or isinstance(item[0]['workexp'], list):
                   #del item[0]['id_cv'] 
@@ -128,8 +127,6 @@ def process_chunk(chunk):
                       item[0]['birthday'] = _max(item[0]['birthday'])
                   if pd.notna(item[0]['birthday']) and int(item[0]['birthday']) <= 1943:
                       item[0]['birthday'] = np.nan
-                  if item[0]['id_cv'] == '57ee7ca0-4b9d-11ee-a09b-95925ccb94dc':
-                    print(item)
                   del item[0]['id_cv'] 
                   filtered += item
     return filtered

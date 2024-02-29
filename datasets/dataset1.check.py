@@ -46,13 +46,13 @@ if __name__ == '__main__':
     data.drop_duplicates(inplace=True)
     print(f'size of {edu_filename_out}: {len(data)}')
 
-    print(f"NA in graduate year: {len(pd.isna(data['graduate_year']).sum())}")
+    print(f"NA in graduate year: {pd.isna(data['graduate_year']).sum()}")
     data = data.set_index('id_candidate').join(cand_id.set_index('id_candidate'))
     data['graduate_year'] = data.apply(lambda x: x['graduate_year'] if pd.isna(x['birthday']) or (
                                                                             pd.notna(x['graduate_year']) and
                                                                             pd.notna(x['birthday']) and
-                                                                            int(x['graduate_year']) > int(x['birthday']) + 10) else np.nan, axis=1)
-    print(f"NA in graduate year: {len(pd.isna(data['graduate_year']).sum())}")
+                                                                            float(x['graduate_year']) > float(x['birthday']) + 10) else np.nan, axis=1)
+    print(f"NA in graduate year: {pd.isna(data['graduate_year']).sum()}")
 
     data.reset_index().drop('birthday', axis=1).to_csv(os.path.join(base_dir, edu_filename_out), sep='|', index=False)
     del data
