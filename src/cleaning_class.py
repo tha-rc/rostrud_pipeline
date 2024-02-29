@@ -255,8 +255,8 @@ class CleaningData:
         df['date_mistake'] = 0
         df.loc[df.date_from.str[0:4].fillna(1960).astype('int64') < (now.year - 70), 'date_mistake'] = 1
         df.loc[df.date_to.str[0:4].fillna(1960).astype('int64') < (now.year - 70), 'date_mistake'] = 1
-        df.loc[df.date_from.str[0:4].fillna(2021).astype('int64') > now.year, 'date_mistake'] = 1
-        df.loc[df.date_to.str[0:4].fillna(2021).astype('int64') > now.year, 'date_mistake'] = 1
+        df.loc[df.date_from.str[0:4].fillna(2023).astype('int64') > now.year, 'date_mistake'] = 1
+        df.loc[df.date_to.str[0:4].fillna(2023).astype('int64') > now.year, 'date_mistake'] = 1
         df.loc[df.date_from == df.date_to, 'date_mistake'] = 1
         df.loc[df.date_from > df.date_to, 'date_mistake'] = 1
         return df

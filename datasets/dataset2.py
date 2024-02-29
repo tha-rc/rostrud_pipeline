@@ -83,7 +83,9 @@ def process_chunk(chunk):
             if isinstance(item[0]['gender'], list):
                       item[0]['gender'] = _max(item[0]['gender'])
             if isinstance(item[0]['birthday'], list):
-                      item[0]['birthday'] = _max(item[0]['birthday'])        
+                      item[0]['birthday'] = _max(item[0]['birthday'])   
+            if pd.notna(item[0]['birthday']) and int(item[0]['birthday']) <= 1943:
+                      item[0]['birthday'] = np.nan     
             if isinstance(item[0]['region_code'], list):
                      item[0]['region_code'] = ', '.join([str(int(i)) for i in item[0]['region_code']])                     
             if isinstance(item[0]['len_add_certificates_modified'], list):

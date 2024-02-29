@@ -87,6 +87,8 @@ def process_chunk(chunk):
     chunk['position_name'] = chunk['position_name'].parallel_apply(_clean)
     
     for idx, subset in chunk.groupby(['id_candidate']):
+              #if idx == '57ee7ca0-4b9d-11ee-a09b-95925ccb94dc':
+              #  print(subset)
               if len(subset) > 1: # если есть несколько CV, то собираем в одну запись всю информацию
                   subset = subset.to_dict('records') #sort_values(by='date_modify_inner_info').
                   item = {k : [] for k in subset[0].keys()}
@@ -100,9 +102,11 @@ def process_chunk(chunk):
                   item = [{k : _deduplicate(v) for k, v in item.items()}] 
               else:
                   item = subset.to_dict('records') # здесь только одно CV
+              if item[0]['id_cv'] == '57ee7ca0-4b9d-11ee-a09b-95925ccb94dc':
+                  print(item)
               # фильтруем только кандидатов, указавших информацию
               if isinstance(item[0]['edu'], list) or isinstance(item[0]['addedu'], list) or isinstance(item[0]['workexp'], list):
-                  del item[0]['id_cv'] 
+                  #del item[0]['id_cv'] 
                   # объединяем edu и addedu
                   if isinstance(item[0]['edu'], list) and isinstance(item[0]['addedu'], list):
                     item[0]['edu'] = item[0]['edu'] + item[0]['addedu']
@@ -122,6 +126,11 @@ def process_chunk(chunk):
                       item[0]['gender'] = _max(item[0]['gender'])
                   if isinstance(item[0]['birthday'], list):
                       item[0]['birthday'] = _max(item[0]['birthday'])
+                  if pd.notna(item[0]['birthday']) and int(item[0]['birthday']) <= 1943:
+                      item[0]['birthday'] = np.nan
+                  if item[0]['id_cv'] == '57ee7ca0-4b9d-11ee-a09b-95925ccb94dc':
+                    print(item)
+                  del item[0]['id_cv'] 
                   filtered += item
     return filtered
 
@@ -204,7 +213,7 @@ if __name__ == '__main__':
                                                                             'birthday': 'Int64',
                                                                             #'region_code': str,
                                                                             })
-                  cand['birthday'] = cand['birthday'].parallel_apply(lambda x: x if x >= 1917 else np.nan)
+                  #cand['birthday'] = cand['birthday'].parallel_apply(lambda x: x if x >= 1917 else np.nan)
                   cand.to_csv(cand_filename,
                               header=(total_size==0), mode='a', sep='|', index=False)
                   del cand

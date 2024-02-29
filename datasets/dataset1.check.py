@@ -1,10 +1,10 @@
-import re, os
-import hashlib
-import functools
+import os
+#import hashlib
+#import functools
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-from ast import literal_eval
+#from tqdm import tqdm
+#from ast import literal_eval
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -34,6 +34,7 @@ if __name__ == '__main__':
     data = pd.concat([data, dup], ignore_index=True)
     data.to_csv(os.path.join(base_dir, cand_filename_out), sep='|', index=False)
     print(f'size of {cand_filename_out}: {len(data)}')
+    cand_id = data[['id_candidate', 'birthday']]
     del dup
     del data
     # 6221439
@@ -44,8 +45,18 @@ if __name__ == '__main__':
     print(f'duplicated {edu_filename_in}: {dup_idx.sum()}')
     data.drop_duplicates(inplace=True)
     print(f'size of {edu_filename_out}: {len(data)}')
-    data.to_csv(os.path.join(base_dir, edu_filename_out), sep='|', index=False)
+
+    print(f"NA in graduate year: {len(pd.isna(data['graduate_year']).sum())}")
+    data = data.set_index('id_candidate').join(cand_id.set_index('id_candidate'))
+    data['graduate_year'] = data.apply(lambda x: x['graduate_year'] if pd.isna(x['birthday']) or (
+                                                                            pd.notna(x['graduate_year']) and
+                                                                            pd.notna(x['birthday']) and
+                                                                            int(x['graduate_year']) > int(x['birthday']) + 10) else np.nan, axis=1)
+    print(f"NA in graduate year: {len(pd.isna(data['graduate_year']).sum())}")
+
+    data.reset_index().drop('birthday', axis=1).to_csv(os.path.join(base_dir, edu_filename_out), sep='|', index=False)
     del data
+    del cand_id
     # 9124525
 
     data = pd.read_csv(os.path.join(base_dir, workexp_filename_in), sep='|', parse_dates=False, dtype=str)
