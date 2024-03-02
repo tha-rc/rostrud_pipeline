@@ -1,4 +1,4 @@
-import re, os
+import re, os, sys
 import hashlib
 import functools
 import numpy as np
@@ -89,20 +89,33 @@ def process_chunk(chunk):
     for idx, subset in chunk.groupby(['id_candidate']):
               #if idx == '57ee7ca0-4b9d-11ee-a09b-95925ccb94dc':
               #  print(subset)
+              p = 0
               if len(subset) > 1: # если есть несколько CV, то собираем в одну запись всю информацию
                   subset = subset.to_dict('records') #sort_values(by='date_modify_inner_info').
                   item = {k : [] for k in subset[0].keys()}
+                  
                   for i in subset:
                     for k in item.keys():
                       if isinstance(i[k], list):
                         item[k] += i[k]
                       elif pd.notna(i[k]):
                         item[k] += [i[k]]
+
+                  
+                  #if len(set(item['birthday'])) > 1:
+                  #  print()
+                  #  print(item)
+                  #  p = 1
                   # очередня попытка удалить явные дубликаты словарей, появившиеся при объединении CV
                   item = [{k : _deduplicate(v) for k, v in item.items()}] 
+                  
+                  #if p:
+                  #  print()
+                  #  print(item)
+                    #sys.exit(0)
               else:
                   item = subset.to_dict('records') # здесь только одно CV
-              print(item)
+              
               # фильтруем только кандидатов, указавших информацию
               if isinstance(item[0]['edu'], list) or isinstance(item[0]['addedu'], list) or isinstance(item[0]['workexp'], list):
                   #del item[0]['id_cv'] 
@@ -127,6 +140,12 @@ def process_chunk(chunk):
                       item[0]['birthday'] = _max(item[0]['birthday'])
                   if pd.notna(item[0]['birthday']) and int(item[0]['birthday']) <= 1943:
                       item[0]['birthday'] = np.nan
+
+                  #if p:
+                  #   print()
+                  #   print(item)
+                  #   sys.exit(0)
+
                   del item[0]['id_cv'] 
                   filtered += item
     return filtered
