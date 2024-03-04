@@ -26,7 +26,7 @@ if __name__ == '__main__':
     print(f'duplicated {clean_filename_in}: {len(dup)}')
     dup.sort_values(by=['birthday', 'date_modify_inner_info'], ascending=True, inplace=True)
     dup = dup[~dup.id_candidate.duplicated()]
-    data = pd.concat([data, dup], ignore_index=True)
+    data = pd.concat([data, dup], ignore_index=True).rename(columns={'birthday' : 'birthyear'})
     data.to_csv(os.path.join(base_dir, clean_filename_out), sep='|', index=False)
     print(f'size of {clean_filename_out}: {len(data)}')
     del dup

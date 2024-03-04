@@ -31,10 +31,10 @@ if __name__ == '__main__':
     print(f'duplicated {cand_filename_in}: {len(dup)}')
     dup.sort_values(by=['birthday', 'date_modify_inner_info'], ascending=True, inplace=True)
     dup = dup[~dup.id_candidate.duplicated()]
-    data = pd.concat([data, dup], ignore_index=True)
+    data = pd.concat([data, dup], ignore_index=True).rename(columns={'birthday' : 'birthyear'})
     data.to_csv(os.path.join(base_dir, cand_filename_out), sep='|', index=False)
     print(f'size of {cand_filename_out}: {len(data)}')
-    cand_id = data[['id_candidate', 'birthday']]
+    cand_id = data[['id_candidate', 'birthyear']]
     del dup
     del data
     # 6221439
@@ -48,13 +48,13 @@ if __name__ == '__main__':
 
     print(f"NA in graduate year: {pd.isna(data['graduate_year']).sum()}")
     data = data.set_index('id_candidate').join(cand_id.set_index('id_candidate'))
-    data['graduate_year'] = data.apply(lambda x: x['graduate_year'] if pd.isna(x['birthday']) or (
+    data['graduate_year'] = data.apply(lambda x: x['graduate_year'] if pd.isna(x['birthyear']) or (
                                                                             pd.notna(x['graduate_year']) and
-                                                                            pd.notna(x['birthday']) and
-                                                                            float(x['graduate_year']) > float(x['birthday']) + 10) else np.nan, axis=1)
+                                                                            pd.notna(x['birthyear']) and
+                                                                            float(x['graduate_year']) > float(x['birthyear']) + 10) else np.nan, axis=1)
     print(f"NA in graduate year: {pd.isna(data['graduate_year']).sum()}")
 
-    data.reset_index().drop('birthday', axis=1).to_csv(os.path.join(base_dir, edu_filename_out), sep='|', index=False)
+    data.reset_index().drop('birthyear', axis=1).to_csv(os.path.join(base_dir, edu_filename_out), sep='|', index=False)
     del data
     del cand_id
     # 9124525
