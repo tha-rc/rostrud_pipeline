@@ -18,7 +18,7 @@ if __name__ == '__main__':
     clean_filename_in = os.path.join(base_dir, f"{dataset_filename}.clean.clean.csv")
     
     
-    data = pd.read_csv(clean_filename_in, sep='|', compression='zip', parse_dates=True)
+    data = pd.read_csv(clean_filename_in, sep='|', parse_dates=True)
     data['date_1'] = pd.to_numeric(pd.to_datetime(data.date_publish) - pd.to_datetime(data.date_creation))
     data['date_2'] = pd.to_numeric(pd.to_datetime(data.date_modify_inner_info) - pd.to_datetime(data.date_creation))
     data['age'] = 2023 - data.birthyear
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     x_ = imp.transform(data)
     sca.fit(x_)
     x_ = sca.transform(x_)
-    for s in tqdm([10000, 100000, 1000000]):
+    for s in tqdm([1000, 10000, 100000, 1000000]):
         for i in tqdm(range(2, n+1), leave=False):
             kmeans = KMeans(n_clusters=i, random_state=13, n_init='auto')
             sil.append((i, s, silhouette_score(x_, kmeans.fit_predict(x_), sample_size=s, random_state=13)))
