@@ -27,6 +27,7 @@ if __name__ == '__main__':
     print('n =', len(x))
     
     n_clusters = 2
+    np.random.seed(13)
     results = k_pod(x, n_clusters) # https://pypi.org/project/kPOD/
     data = pd.concat([data, pd.Series(results[0]).rename('cluster')], axis=1)[['id_candidate', 'region_code', 'birthyear', 'gender', 'experience',
        'education_type', 'busy_type', 'salary', 'responses', 'date_creation', 'date_publish', 'date_modify_inner_info', 'is_generated', 'cluster']]
