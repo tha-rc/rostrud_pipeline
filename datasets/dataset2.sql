@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS project_trudvsem.dataset2 AS
 		WHEN education_type = 'Незаконченное высшее' THEN 2
 		WHEN education_type = 'Неоконченное высшее' THEN 2
 		WHEN education_type = 'Среднее' THEN 3
-		WHEN education_type = 'Среднее профессиональное' THEN 3
+		WHEN education_type = 'Среднее профессиональное' THEN 4
 		ELSE NULL
 	END AS education_type, -- Тип образования
 	--CASE
@@ -111,7 +111,7 @@ FROM project_trudvsem.curricula_vitae AS cv
           substring(region_code::text from 1 for 2) != '91' AND --КЛАДР Крым
           substring(region_code::text from 1 for 2) != '92' AND --КЛАДР Севастополь
           substring(region_code::text from 1 for 2) != '93' AND --КЛАДР Донецкая
-          substring(region_code::text from 1 for 2) != '94' AND --КЛАДР Луганская
-          date_publish >= '2019.01.01'
+          substring(region_code::text from 1 for 2) != '94' --AND --КЛАДР Луганская
+          -- date_publish >= '2019.01.01'
 -- ORDER BY id_candidate, date_publish, date_modify_inner_info DESC
 -- LIMIT 500
