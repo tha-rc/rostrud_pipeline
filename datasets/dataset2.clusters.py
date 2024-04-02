@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import numpy as np
-from tqdm import tqdm
 from kPOD import k_pod
 
 import warnings
@@ -30,7 +29,9 @@ if __name__ == '__main__':
     n_clusters = 2
     np.random.seed(13)
     results = k_pod(x, n_clusters) # https://pypi.org/project/kPOD/
-    data = pd.concat([data, pd.Series(results[0]).rename('cluster')], axis=1)[['id_candidate', 'region_code', 'birthyear', 'gender', 'experience',
+    results = pd.Series(results[0]).astype(bool)
+    results = (~results).astype(int)
+    data = pd.concat([data, results.rename('cluster')], axis=1)[['id_candidate', 'region_code', 'birthyear', 'gender', 'experience',
        'education_type', 'busy_type', 'salary', 'responses', 'date_creation', 'date_publish', 'date_modify_inner_info', 'is_generated', 'cluster']]
     data.astype({'salary': 'Int64', 'responses': 'Int64',
                                                 'gender': 'Int64', 'experience': 'Int64',
