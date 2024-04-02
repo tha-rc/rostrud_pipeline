@@ -2,7 +2,6 @@
 import re
 import os
 import pandas as pd
-#from os import listdir
 import datetime
 from conf import Config
 

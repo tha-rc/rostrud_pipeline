@@ -5,9 +5,8 @@ import hashlib
 from tqdm import tqdm
 from lxml import etree
 from adding_tables_psycopg import AddingDataPsycopg
-from geti import hashes, create_md5 #update_hashes
+from geti import hashes, create_md5
 from conf import Config
-#from rostrud_ml.process.utils import save_pickle
 
 def save_pickle(df, file_name):
     if len(df) > 0:

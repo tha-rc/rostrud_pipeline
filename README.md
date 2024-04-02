@@ -21,6 +21,7 @@ The execution order:
 - execute `datasetX.sql` to create a raw data table
 - export the table to `datasetX.csv` with headers
 - execute `datasetX.py` to get the cleaned `datasetX.csv.clean.csv`
+- execute `datasetX.check.py` to get the final version of datafiles
 
 ## License
 
