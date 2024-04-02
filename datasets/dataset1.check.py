@@ -54,7 +54,7 @@ if __name__ == '__main__':
                                                                             float(x['graduate_year']) > float(x['birthyear']) + 10) else np.nan, axis=1)
     print(f"NA in graduate year: {pd.isna(data['graduate_year']).sum()}")
 
-    data.reset_index().drop('birthyear', axis=1).to_csv(os.path.join(base_dir, edu_filename_out), sep='|', index=False)
+    data.reset_index().drop(['birthyear', 'description'], axis=1).to_csv(os.path.join(base_dir, edu_filename_out), sep='|', index=False)
     del data
     del cand_id
     # 9124525
