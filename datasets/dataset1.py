@@ -78,8 +78,6 @@ def _clean(x):
 
 def process_chunk(chunk):
     filtered = []
-    # rehash
-    #chunk['id_candidate'] = chunk['id_candidate'].parallel_apply(_hash)
     # попытка удалить явные дубликаты словарей внутри CV и пустые списки   
     chunk['addedu'] = chunk['addedu'].parallel_apply(_deduplicate) 
     chunk['edu'] = chunk['edu'].parallel_apply(_deduplicate) 
@@ -87,9 +85,7 @@ def process_chunk(chunk):
     chunk['position_name'] = chunk['position_name'].parallel_apply(_clean)
     
     for idx, subset in chunk.groupby(['id_candidate']):
-              #if idx == '57ee7ca0-4b9d-11ee-a09b-95925ccb94dc':
-              #  print(subset)
-              p = 0
+
               if len(subset) > 1: # если есть несколько CV, то собираем в одну запись всю информацию
                   subset = subset.to_dict('records') #sort_values(by='date_modify_inner_info').
                   item = {k : [] for k in subset[0].keys()}
@@ -101,18 +97,9 @@ def process_chunk(chunk):
                       elif pd.notna(i[k]):
                         item[k] += [i[k]]
 
-                  
-                  #if len(set(item['birthday'])) > 1:
-                  #  print()
-                  #  print(item)
-                  #  p = 1
                   # очередня попытка удалить явные дубликаты словарей, появившиеся при объединении CV
                   item = [{k : _deduplicate(v) for k, v in item.items()}] 
                   
-                  #if p:
-                  #  print()
-                  #  print(item)
-                    #sys.exit(0)
               else:
                   item = subset.to_dict('records') # здесь только одно CV
               
