@@ -15,6 +15,7 @@ if __name__ == '__main__':
 
     data = pd.read_csv(os.path.join(base_dir, clean_filename_in), sep='|', parse_dates=False, dtype=str)
     print(f'size of {clean_filename_in}: {len(data)}')
+    data.dropna(subset='date_creation', inplace=True)
     dup_idx = data.id_candidate.duplicated(keep=False)
     dup = data[dup_idx].copy()
     data = data[~dup_idx]

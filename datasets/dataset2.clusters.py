@@ -1,4 +1,5 @@
 import os
+import random
 import pandas as pd
 import numpy as np
 from kPOD import k_pod
@@ -27,10 +28,10 @@ if __name__ == '__main__':
     print('n =', len(x))
     
     n_clusters = 2
+    random.seed(13)
     np.random.seed(13)
     results = k_pod(x, n_clusters) # https://pypi.org/project/kPOD/
-    results = pd.Series(results[0]).astype(bool)
-    results = (~results).astype(int)
+    results = pd.Series(results[0]).astype(bool).apply(lambda x: 1 if not x else 0).astype(int)
     data = pd.concat([data, results.rename('cluster')], axis=1)[['id_candidate', 'region_code', 'birthyear', 'gender', 'experience',
        'education_type', 'busy_type', 'salary', 'responses', 'date_creation', 'date_publish', 'date_modify_inner_info', 'is_generated', 'cluster']]
     data.astype({'salary': 'Int64', 'responses': 'Int64',
