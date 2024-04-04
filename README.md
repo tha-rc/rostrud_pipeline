@@ -32,4 +32,4 @@ All raw data available in the source are distributed in the public domain and ar
 
 ## References
 
-- Valko, D., Vasilevskaia, M., Bunina, M., Kozlova, M., Filippova, A. M., & Rud, D. (2024). Educational and Career Trajectories in Russia: Open Datasets (1.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.10913326
+- Valko, D., Vasilevskaia, M., Bunina, M., Kozlova, M., Filippova, A. M., & Rud, D. (2024). Educational and Career Trajectories in Russia: Open Datasets. Zenodo. https://doi.org/10.5281/zenodo.10913325
