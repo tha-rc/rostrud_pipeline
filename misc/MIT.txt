@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2023 The Hannah Arendt Research Center & Danila Valko
+Copyright (c) 2023 The Hannah Arendt Research Center
 
 =======================================================================
 
