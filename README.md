@@ -30,6 +30,23 @@ We adapted a pipeline that was originally developed by researchers from [CPUR](h
 
 All raw data available in the source are distributed in the public domain and are completely free of charge based on the principles of use by the Russian Government ([see](https://github.com/tha-rc/rostrud_pipeline/blob/main/misc/protokol2016.pdf)). The data that was obtained as a result of our scripts are distributed under CC-BY-4.0 ([see](https://github.com/tha-rc/rostrud_pipeline/blob/main/misc/CC-BY-4.0.txt)). All code is provided under the MIT license ([see](https://github.com/tha-rc/rostrud_pipeline/blob/main/misc/MIT.txt)) and can also be used freely.
 
-## References
+## Cite
+Valko, D., Vasilevskaia, M., Bunina, M., Kozlova, M., Filippova, A. M., & Rud, D. (2024). Educational and Career Trajectories in Russia: Introducing a New Source and Datasets with a High Granularity. Research Data Journal for the Humanities and Social Sciences. https://doi.org/10.1163/24523666-bja10046
 
+```sh
+@article{Valkoetal2024,
+      author = "Danila Valko and Mariia Vasilevskaia and Maria Bunina and Mariia Kozlova and Anna Maria Filippova and Daria Rud",
+      title = "Educational and Career Trajectories in Russia: Introducing a New Source and Datasets with a High Granularity",
+      journal = "Research Data Journal for the Humanities and Social Sciences",
+      year = "2024",
+      publisher = "Brill",
+      address = "Leiden, The Netherlands",
+      doi = "10.1163/24523666-bja10046",
+      pages = "1 - 14",
+      url = "https://brill.com/view/journals/rdj/aop/article-10.1163-24523666-bja10046/article-10.1163-24523666-bja10046.xml"
+}
+```
+
+## References
+- Valko, D., Vasilevskaia, M., Bunina, M., Kozlova, M., Filippova, A. M., & Rud, D. (2024). Educational and Career Trajectories in Russia: Introducing a New Source and Datasets with a High Granularity. Research Data Journal for the Humanities and Social Sciences. https://doi.org/10.1163/24523666-bja10046
 - Valko, D., Vasilevskaia, M., Bunina, M., Kozlova, M., Filippova, A. M., & Rud, D. (2024). Educational and Career Trajectories in Russia: Open Datasets. Zenodo. https://doi.org/10.5281/zenodo.10913325
